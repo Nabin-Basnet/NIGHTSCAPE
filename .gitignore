@@ -1,0 +1,17 @@
+# === Django / Python ===
+backend/myvenv/
+**/__pycache__/
+*.py[cod]
+*.sqlite3
+*.log
+
+# === Node / React ===
+frontend/node_modules/
+frontend/build/
+frontend/.env
+
+# === System / Editor Files ===
+.DS_Store
+*.swp
+.vscode/
+.idea/
