@@ -15,3 +15,5 @@ frontend/.env
 *.swp
 .vscode/
 .idea/
+
+.gitignore
