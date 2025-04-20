@@ -2,13 +2,12 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 // import App from './App.jsx'
-import Navbar from './Components/Navbar.jsx'
-import LoginForm from './pages/LoginPage.jsx'
+import { RouterProvider } from 'react-router-dom'
+import router from './Routes.jsx'
 
 createRoot(document.getElementById('root')).render(
-  <StrictMode>
-    {/* <App /> */}
-    <Navbar/>
-    <LoginForm/>
-  </StrictMode>,
+   <StrictMode>
+      <RouterProvider router={router}/>
+   </StrictMode>
+   
 )
