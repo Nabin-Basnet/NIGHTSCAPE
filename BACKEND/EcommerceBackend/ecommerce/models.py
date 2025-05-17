@@ -1,3 +1,173 @@
 from django.db import models
+from django.utils import timezone
 
-# Create your models here.
+# 1. Users (Only 'customer' and 'admin')
+class User(models.Model):
+    ROLE_CHOICES = [('customer', 'Customer'), ('admin', 'Admin')]
+
+    name = models.CharField(max_length=255)
+    email = models.EmailField(unique=True)
+    password = models.CharField(max_length=255)
+    phone = models.CharField(max_length=20, blank=True, null=True)
+    role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='customer')
+    created_at = models.DateTimeField(default=timezone.now)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.name
+
+# 2. Categories
+class Category(models.Model):
+    name = models.CharField(max_length=255)
+    description = models.TextField(blank=True, null=True)
+    image = models.ImageField(upload_to='categories/', blank=True, null=True)
+    parent = models.ForeignKey('self', null=True, blank=True, on_delete=models.SET_NULL, related_name='subcategories')
+
+    def __str__(self):
+        return self.name
+
+# 3. Brands
+class Brand(models.Model):
+    name = models.CharField(max_length=255)
+    description = models.TextField(blank=True, null=True)
+    logo = models.ImageField(upload_to='brands/', blank=True, null=True)
+
+    def __str__(self):
+        return self.name
+
+# 4. Products (No vendor field since it's single-vendor)
+class Product(models.Model):
+    name = models.CharField(max_length=255)
+    description = models.TextField(blank=True, null=True)
+    price = models.FloatField()
+    stock_quantity = models.IntegerField()
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True)
+    brand = models.ForeignKey(Brand, on_delete=models.SET_NULL, null=True)
+    discount = models.FloatField(blank=True, null=True)
+    rating = models.FloatField(default=0.0)
+    image = models.ImageField(upload_to='products/', blank=True, null=True)
+    created_at = models.DateTimeField(default=timezone.now)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.name
+
+# 5. Addresses
+class Address(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    street = models.TextField()
+    city = models.CharField(max_length=100)
+    state = models.CharField(max_length=100)
+    zip_code = models.CharField(max_length=20)
+    country = models.CharField(max_length=100)
+
+    def __str__(self):
+        return f"{self.user.name} - {self.city}, {self.country}"
+
+# 6. Orders
+class Order(models.Model):
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('shipping', 'Shipping'),
+        ('delivered', 'Delivered'),
+        ('canceled', 'Canceled'),
+    ]
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    address = models.ForeignKey(Address, on_delete=models.SET_NULL, null=True)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
+    total_amount = models.FloatField()
+    order_date = models.DateTimeField(default=timezone.now)
+    delivery_date = models.DateTimeField(blank=True, null=True)
+    notes = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return f"Order #{self.id} by {self.user.name}"
+
+# 7. Order Items
+class OrderItem(models.Model):
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
+    product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
+    quantity = models.IntegerField()
+    price = models.FloatField()  # captured at purchase time
+
+    def __str__(self):
+        return f"{self.quantity} x {self.product.name}"
+
+# 8. Cart
+class Cart(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    quantity = models.IntegerField()
+    created_at = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return f"{self.user.name}'s Cart"
+
+# 9. Wishlist
+class Wishlist(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return f"{self.user.name}'s Wishlist"
+
+# 10. Payments
+class Payment(models.Model):
+    METHOD_CHOICES = [
+        ('card', 'Card'),
+        ('cash', 'Cash'),
+        ('bank', 'Bank'),
+        ('esewa', 'Esewa'),
+        ('khalti', 'Khalti'),
+    ]
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    order = models.ForeignKey(Order, on_delete=models.CASCADE)
+    method = models.CharField(max_length=20, choices=METHOD_CHOICES)
+    amount = models.FloatField()
+    payment_date = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return f"Payment #{self.id} by {self.user.name}"
+
+# 11. Reviews
+class Review(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    rating = models.IntegerField()
+    comments = models.TextField(blank=True, null=True)
+    review_date = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return f"{self.rating} stars by {self.user.name}"
+
+# 12. Returns
+class Return(models.Model):
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected'),
+    ]
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    order = models.ForeignKey(Order, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    reason = models.TextField()
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
+    request_date = models.DateTimeField(default=timezone.now)
+    approved_date = models.DateTimeField(blank=True, null=True)
+
+    def __str__(self):
+        return f"Return #{self.id} - {self.status}"
+
+# 13. Featured Products / Promotions
+class FeaturedProduct(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    highlight_type = models.CharField(max_length=100)
+    start_date = models.DateTimeField()
+    end_date = models.DateTimeField()
+
+    def __str__(self):
+        return f"Featured: {self.product.name}"
