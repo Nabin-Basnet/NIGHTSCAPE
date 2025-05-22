@@ -1,7 +1,7 @@
 from django.db import models
 from django.utils import timezone
 
-# 1. Users (Only 'customer' and 'admin')
+# 1. Users
 class User(models.Model):
     ROLE_CHOICES = [('customer', 'Customer'), ('admin', 'Admin')]
 
@@ -35,7 +35,7 @@ class Brand(models.Model):
     def __str__(self):
         return self.name
 
-# 4. Products (No vendor field since it's single-vendor)
+# 4. Products
 class Product(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
@@ -45,14 +45,23 @@ class Product(models.Model):
     brand = models.ForeignKey(Brand, on_delete=models.SET_NULL, null=True)
     discount = models.FloatField(blank=True, null=True)
     rating = models.FloatField(default=0.0)
-    image = models.ImageField(upload_to='products/', blank=True, null=True)
+    image = models.ImageField(upload_to='products/', blank=True, null=True)  # main image (optional)
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.name
 
-# 5. Addresses
+# 5. Product Images (for multiple images per product)
+class ProductImage(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images')
+    image = models.ImageField(upload_to='product_images/')
+    alt_text = models.CharField(max_length=255, blank=True, null=True)
+
+    def __str__(self):
+        return f"Image for {self.product.name}"
+
+# 6. Addresses
 class Address(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     street = models.TextField()
@@ -64,7 +73,7 @@ class Address(models.Model):
     def __str__(self):
         return f"{self.user.name} - {self.city}, {self.country}"
 
-# 6. Orders
+# 7. Orders
 class Order(models.Model):
     STATUS_CHOICES = [
         ('pending', 'Pending'),
@@ -84,7 +93,7 @@ class Order(models.Model):
     def __str__(self):
         return f"Order #{self.id} by {self.user.name}"
 
-# 7. Order Items
+# 8. Order Items
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
     product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
@@ -94,7 +103,7 @@ class OrderItem(models.Model):
     def __str__(self):
         return f"{self.quantity} x {self.product.name}"
 
-# 8. Cart
+# 9. Cart
 class Cart(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
@@ -104,7 +113,7 @@ class Cart(models.Model):
     def __str__(self):
         return f"{self.user.name}'s Cart"
 
-# 9. Wishlist
+# 10. Wishlist
 class Wishlist(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
@@ -113,7 +122,7 @@ class Wishlist(models.Model):
     def __str__(self):
         return f"{self.user.name}'s Wishlist"
 
-# 10. Payments
+# 11. Payments
 class Payment(models.Model):
     METHOD_CHOICES = [
         ('card', 'Card'),
@@ -132,7 +141,7 @@ class Payment(models.Model):
     def __str__(self):
         return f"Payment #{self.id} by {self.user.name}"
 
-# 11. Reviews
+# 12. Reviews
 class Review(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
@@ -143,7 +152,7 @@ class Review(models.Model):
     def __str__(self):
         return f"{self.rating} stars by {self.user.name}"
 
-# 12. Returns
+# 13. Returns
 class Return(models.Model):
     STATUS_CHOICES = [
         ('pending', 'Pending'),
@@ -162,7 +171,7 @@ class Return(models.Model):
     def __str__(self):
         return f"Return #{self.id} - {self.status}"
 
-# 13. Featured Products / Promotions
+# 14. Featured Products / Promotions
 class FeaturedProduct(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     highlight_type = models.CharField(max_length=100)
