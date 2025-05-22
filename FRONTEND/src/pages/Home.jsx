@@ -3,15 +3,16 @@ import React from "react";
 export default function Home() {
   return (
     <div className="font-sans text-gray-800">
-      
+
 
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-blue-100 to-blue-300 py-20 text-center">
-        <h2 className="text-4xl md:text-5xl font-bold mb-4">Light Up Your World</h2>
-        <p className="text-lg md:text-xl mb-6">High-quality bulbs & neon boards for every occasion</p>
+      <section
+        className="bg-[url('/images/hero_img.jpeg')] h-[600px] bg-cover bg-center bg-no-repeat bg-blend-overlay bg-gradient-to-r from-blue-100 to-blue-300 py-20 text-center h-500px"
+      >
+        <h2 className="text-4xl md:text-5xl font-bold mb-4 text-white">Light Up Your World</h2>
+        <p className="text-lg md:text-xl mb-6 text-white">High-quality bulbs & neon boards for every occasion</p>
         <button className="px-6 py-3 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition">Shop Now</button>
       </section>
-
       {/* Categories */}
       <section className="max-w-7xl mx-auto py-16 px-4">
         <h3 className="text-2xl font-semibold text-center mb-10">Shop by Category</h3>
@@ -40,7 +41,7 @@ export default function Home() {
         </div>
       </section>
 
-     
+
     </div>
   );
 }

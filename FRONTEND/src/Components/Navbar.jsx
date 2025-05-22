@@ -1,18 +1,16 @@
 // src/components/Header.jsx
 import React from "react";
-import { FaPhone, FaLock, FaUser, FaSearch, FaHeart } from "react-icons/fa";
+import { FaPhone, FaLock, FaUser, FaSearch } from "react-icons/fa";
+import {BsCart4} from "react-icons/bs";
 
 export default function Navbar() {
   return (
     <div className="bg-[#121212] text-white">
       {/* Header Part 1 */}
-      <div className="flex items-center h-[50px] bg-[#1e1e1e] text-sm font-medium font-sans border-b border-gray-700">
-        <div className="ml-[150px] text-[#9db4ff] hover:text-[#ff5c00]">
-          <a href="#"><strong>Price Match Guarantee*</strong></a>
-        </div>
+      <div className="flex justify-end items-center h-[50px] bg-[#1e1e1e] text-sm font-medium font-sans border-b border-gray-700">
 
         <div className="ml-[700px] text-gray-300 hover:text-[#ff5c00]">
-          <a href="#"><FaPhone className="inline" /> 609.666.4464</a>
+          <a href="#"><FaPhone className="inline" /> 9708845245</a>
         </div>
 
         <div className="h-[25px] border-r-2 border-gray-600 mx-2"></div>
@@ -28,7 +26,7 @@ export default function Navbar() {
         </div>
 
         <div className="w-[70px] h-[50px] bg-gray-700 ml-8 text-white flex items-center justify-center">
-          USD
+          NEP
         </div>
       </div>
 
@@ -36,7 +34,8 @@ export default function Navbar() {
       <div className="flex items-center h-[100px] bg-[#181818] border-b border-gray-700">
         <div className="ml-[150px] mt-2">
           <img
-            src="https://sora.chatgpt.com/g/gen_01jvpssqk0f529dqth1ksdwgrw"
+            className="h-30 w-auto object-contain"
+            src="/images/logo.png"
             alt="logo"
           />
         </div>
@@ -51,8 +50,8 @@ export default function Navbar() {
           <FaSearch />
         </button>
 
-        <div className="mt-[35px] ml-[80px] text-red-400">
-          <FaHeart size={25} />
+        <div className="mt-[35px] ml-[80px]">
+          <BsCart4 size={35} />
         </div>
       </div>
 
@@ -60,15 +59,12 @@ export default function Navbar() {
       <div className="h-[60px] w-full border-b border-gray-600">
         <div className="flex justify-center items-center h-full space-x-4 text-white text-sm">
           {[
-            "CRICKET BAT",
-            "CRICKET EQUIPMENT",
-            "BALLS",
-            "CRICKET SHOES",
-            "ACCESSORIES",
-            "CLOTHES",
-            "KIDS",
-            "SALE",
-            "PRO QUALITY UNIFORM",
+            "Home",
+            "Custom Design",
+            "Best Sellers",
+            "Offers / Sale",
+            "About Us",
+            "Contact",
           ].map((text, index) => (
             <a
               href="#"
