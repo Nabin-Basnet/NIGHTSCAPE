@@ -7,7 +7,7 @@ export default function Home() {
 
       {/* Hero Section */}
       <section
-        className="bg-[url('/images/hero_img.jpeg')] h-[600px] bg-cover bg-center bg-no-repeat bg-blend-overlay bg-gradient-to-r from-blue-100 to-blue-300 py-20 text-center h-500px"
+        className="bg-[url('/images/hero-image.jpg')] h-[600px] bg-cover bg-center bg-no-repeat bg-blend-overlay bg-gradient-to-r from-blue-100 to-blue-300 py-20 text-center h-500px"
       >
         <h2 className="text-4xl md:text-5xl font-bold mb-4 text-white">Light Up Your World</h2>
         <p className="text-lg md:text-xl mb-6 text-white">High-quality bulbs & neon boards for every occasion</p>
