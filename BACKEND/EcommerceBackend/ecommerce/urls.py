@@ -3,5 +3,4 @@ from ecommerce.views import landing
 
 urlpatterns=[
     path("",landing),
-
 ]
