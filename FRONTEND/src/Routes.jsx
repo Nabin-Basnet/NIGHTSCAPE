@@ -6,7 +6,8 @@ import Contact from "./pages/Contact";
 import UserLayout from "./layouts/UserLayout";
 import LoginForm from "./auth/LoginPage";
 import { ABOUT_ROUTE, HOME_ROUTE, PRODUCTS_ROUTE } from "./constants/navMenu";
-import SinglePageProduct from "./pages/SinglePageProduct";
+import SinglePageProduct from "./pages/SingleProductPage";
+import SingleProductPage from "./pages/SingleProductPage";
 
 const router=createBrowserRouter([
     {
@@ -17,6 +18,7 @@ const router=createBrowserRouter([
                 path: HOME_ROUTE,
                 element:<Home/>
             },
+            
             // {
             //     path: PRODUCTS_ROUTE,
             //     element:<Products/>
@@ -45,6 +47,10 @@ const router=createBrowserRouter([
             {
                 path:"/contact",
                 element:<Contact/>
+            },
+            {
+                path:"/product",
+                element:<SingleProductPage/>
             },
             
         ]

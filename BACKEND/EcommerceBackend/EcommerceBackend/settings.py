@@ -80,16 +80,17 @@ WSGI_APPLICATION = 'EcommerceBackend.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'neondb',
-        'USER': 'neondb_owner',
-        'PASSWORD': 'npg_USIbvZ03xQlX',
-        'HOST': 'ep-shiny-bonus-a489ux4b-pooler.us-east-1.aws.neon.tech',
-        'PORT': '5432',  # default PostgreSQL port
+        'NAME': 'nightscape',
+        'USER': 'nightscape_owner',
+        'PASSWORD': 'npg_3fjrCQD2XViM',
+        'HOST': 'ep-autumn-sun-a5pc9v09-pooler.us-east-2.aws.neon.tech',
+        'PORT': '5432',
         'OPTIONS': {
             'sslmode': 'require',
         },
     }
 }
+
 
 
 # Password validation
