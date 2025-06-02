@@ -1,14 +1,24 @@
-// src/components/Header.jsx
+// src/components/Navbar.jsx
 import React from "react";
 import { FaPhone, FaLock, FaUser, FaSearch } from "react-icons/fa";
-import {BsCart4} from "react-icons/bs";
+import { BsCart4 } from "react-icons/bs";
+import { Link } from "react-router-dom";
+
+import {
+  HOME_ROUTE,
+  ABOUT_ROUTE,
+  PRODUCTS_ROUTE,
+  OFFER_ROUTE,
+  CONTACT_ROUTE,
+  CUSTOM_DESIGN_ROUTE,
+  BEST_SELLER,
+} from "../constants/navMenu"; // Adjust path if needed
 
 export default function Navbar() {
   return (
     <div className="bg-[#121212] text-white">
       {/* Header Part 1 */}
       <div className="flex justify-end items-center h-[50px] bg-[#1e1e1e] text-sm font-medium font-sans border-b border-gray-700">
-
         <div className="ml-[700px] text-gray-300 hover:text-[#ff5c00]">
           <a href="#"><FaPhone className="inline" /> 9708845245</a>
         </div>
@@ -55,71 +65,27 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Navbar */}
+      {/* Navbar Menu */}
       <div className="h-[60px] w-full border-b border-gray-600">
         <div className="flex justify-center items-center h-full space-x-4 text-white text-sm">
           {[
-            "Home",
-            "Custom Design",
-            "Best Sellers",
-            "Offers / Sale",
-            "About Us",
-            "Contact",
-          ].map((text, index) => (
-            <a
-              href="#"
+            { text: "Home", link: HOME_ROUTE },
+            { text: "Custom Design", link: CUSTOM_DESIGN_ROUTE },
+            { text: "Best Sellers", link: BEST_SELLER },
+            { text: "Offers / Sale", link: OFFER_ROUTE },
+            { text: "About Us", link: ABOUT_ROUTE },
+            { text: "Contact", link: CONTACT_ROUTE },
+          ].map(({ text, link }, index) => (
+            <Link
+              to={link}
               key={index}
               className="px-4 py-2 hover:bg-[#ed1c24] rounded-sm"
             >
               {text}
-            </a>
+            </Link>
           ))}
         </div>
       </div>
-
-      {/* Banners */}
-      {/* <div className="flex items-center justify-center gap-12 py-4 mt-2 bg-[#121212] text-sm text-gray-300">
-        <BannerItem
-          src="https://cdn2.bigcommerce.com/server300/3954e/product_images/uploaded_images/truck.png"
-          title="FREE DELIVERY*"
-          subtitle="with coupon"
-        />
-        <Divider />
-        <BannerItem
-          src="https://cdn2.bigcommerce.com/server300/3954e/product_images/uploaded_images/price-match.png"
-          title="PRICE MATCH"
-          subtitle="Guarantee"
-        />
-        <Divider />
-        <BannerItem
-          src="https://cdn2.bigcommerce.com/server300/3954e/product_images/uploaded_images/dispatch.png"
-          title="SAME DAY DISPATCH"
-          subtitle="before 1pm (Mon-Fri)"
-        />
-        <Divider />
-        <BannerItem
-          src="https://cdn2.bigcommerce.com/server300/3954e/product_images/uploaded_images/easy-return.png"
-          title="EASY RETURN"
-          subtitle="Policy"
-        />
-      </div>
     </div>
   );
-}
-
-function BannerItem({ src, title, subtitle }) {
-  return (
-    <div className="flex items-center space-x-2">
-      <img src={src} alt={title} className="h-6" />
-      <div>
-        <strong className="text-white">{title}</strong>
-        <br />
-        <span className="text-gray-400">{subtitle}</span>
-      </div> */}
-    </div>
-  );
-}
-
-function Divider() {
-  return <div className="h-10 border-l-2 border-gray-600"></div>;
 }

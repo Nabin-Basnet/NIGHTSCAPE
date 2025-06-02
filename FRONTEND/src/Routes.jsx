@@ -5,9 +5,18 @@ import About from "./pages/About";
 import Contact from "./pages/Contact";
 import UserLayout from "./layouts/UserLayout";
 import LoginForm from "./auth/LoginPage";
-import { ABOUT_ROUTE, HOME_ROUTE, PRODUCTS_ROUTE } from "./constants/navMenu";
+import { ABOUT_ROUTE, 
+        HOME_ROUTE, 
+        PRODUCTS_ROUTE,
+        CUSTOM_DESIGN_ROUTE,
+        BEST_SELLER,
+        OFFER_ROUTE,
+     } from "./constants/navMenu";
 import SinglePageProduct from "./pages/SingleProductPage";
 import SingleProductPage from "./pages/SingleProductPage";
+import CustonDesign from "./pages/CustonDesign";
+import BestSeller from "./pages/BestSeller";
+import Offer from "./pages/Offer";
 
 const router=createBrowserRouter([
     {
@@ -19,14 +28,14 @@ const router=createBrowserRouter([
                 element:<Home/>
             },
             
-            // {
-            //     path: PRODUCTS_ROUTE,
-            //     element:<Products/>
-            // },
-            // {
-            //     path: "/products/:id",
-            //     element: <SinglePageProduct />
-            // },
+            {
+                path: PRODUCTS_ROUTE,
+                element:<Products/>
+            },
+            {
+                path: "/products/:id",
+                element: <SinglePageProduct />
+            },
             {
                 path: PRODUCTS_ROUTE,
                 children: [
@@ -43,6 +52,18 @@ const router=createBrowserRouter([
             {
                 path: ABOUT_ROUTE,
                 element:<About/>
+            },
+            {
+                path: CUSTOM_DESIGN_ROUTE,
+                element:<CustonDesign/>
+            },
+            {
+                path: BEST_SELLER,
+                element:<BestSeller/>
+            },
+            {
+                path: OFFER_ROUTE,
+                element:<Offer/>
             },
             {
                 path:"/contact",

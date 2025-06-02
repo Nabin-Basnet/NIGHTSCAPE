@@ -30,13 +30,6 @@ const SingleProductPage = () => {
     category: "Electronics",
     brand: "SoundMax",
     image: "https://via.placeholder.com/400",
-    features: [
-      "Active Noise Cancellation",
-      "30-hour battery life",
-      "Bluetooth 5.0",
-      "Quick charge (15 min = 3 hours)",
-      "Premium leather ear cups",
-    ],
   }
 
   const reviews = [
@@ -112,17 +105,6 @@ const SingleProductPage = () => {
               You save ${(product.price - parseFloat(finalPrice)).toFixed(2)}
             </p>
           )}
-
-          <Separator />
-
-          <h3 className="font-semibold">Key Features</h3>
-          <ul className="list-disc pl-5 text-sm text-gray-700">
-            {product.features.map((feature, idx) => (
-              <li key={idx}>{feature}</li>
-            ))}
-          </ul>
-
-          <Separator />
 
           <div className="flex items-center gap-4">
             <span>Quantity:</span>

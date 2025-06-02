@@ -6,7 +6,7 @@ import { ABOUT_ROUTE, CONTACT_ROUTE, HOME_ROUTE, PRODUCTS_ROUTE } from '../const
 
 export default function Footer() {
   return (
-    <footer className="bg-gray-900 text-white pt-12 pb-6 ">
+    <div className="bg-gray-900 text-white pt-12 pb-6 w-full bottom-0 ">
       <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
         
         {/* Logo & About */}
@@ -56,6 +56,6 @@ export default function Footer() {
       <div className="mt-10 border-t border-gray-700 pt-4 text-center text-sm text-gray-500">
         &copy; {new Date().getFullYear()} BrightShop. All rights reserved.
       </div>
-    </footer>
+    </div>
   );
 }
