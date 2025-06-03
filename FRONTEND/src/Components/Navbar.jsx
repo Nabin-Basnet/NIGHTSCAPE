@@ -70,6 +70,7 @@ export default function Navbar() {
         <div className="flex justify-center items-center h-full space-x-4 text-white text-sm">
           {[
             { text: "Home", link: HOME_ROUTE },
+            { text: "Products", link: PRODUCTS_ROUTE },
             { text: "Custom Design", link: CUSTOM_DESIGN_ROUTE },
             { text: "Best Sellers", link: BEST_SELLER },
             { text: "Offers / Sale", link: OFFER_ROUTE },
