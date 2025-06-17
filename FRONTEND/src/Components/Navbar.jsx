@@ -1,8 +1,8 @@
 // src/components/Navbar.jsx
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { FaPhone, FaLock, FaUser, FaSearch } from "react-icons/fa";
 import { BsCart4 } from "react-icons/bs";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import {
   HOME_ROUTE,
@@ -12,9 +12,26 @@ import {
   CONTACT_ROUTE,
   CUSTOM_DESIGN_ROUTE,
   BEST_SELLER,
-} from "../constants/navMenu"; // Adjust path if needed
+  SIGNUP_ROUTE,
+  LOGIN_ROUTE,
+  ACCOUNT_ROUTE, // define this in constants if not already
+} from "../constants/navMenu";
 
 export default function Navbar() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    setIsAuthenticated(!!token);
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    setIsAuthenticated(false);
+    navigate("/"); // redirect to homepage
+  };
+
   return (
     <div className="bg-[#121212] text-white">
       {/* Header Part 1 */}
@@ -25,15 +42,33 @@ export default function Navbar() {
 
         <div className="h-[25px] border-r-2 border-gray-600 mx-2"></div>
 
-        <div className="text-gray-300 hover:text-[#ff5c00]">
-          <a href="#"><FaLock className="inline" /> Sign In</a>
-        </div>
+        {!isAuthenticated ? (
+          <>
+            <div className="text-gray-300 hover:text-[#ff5c00]">
+              <Link to={SIGNUP_ROUTE}><FaLock className="inline" /> Sign In</Link>
+            </div>
 
-        <div className="h-[25px] border-r-2 border-gray-600 mx-2"></div>
+            <div className="h-[25px] border-r-2 border-gray-600 mx-2"></div>
 
-        <div className="text-gray-300 hover:text-[#ff5c00]">
-          <a href="#"><FaUser className="inline" /> My Account</a>
-        </div>
+            <div className="text-gray-300 hover:text-[#ff5c00]">
+              <Link to={LOGIN_ROUTE}><FaLock className="inline" /> Log in</Link>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="text-gray-300 hover:text-[#ff5c00]">
+              <button onClick={handleLogout} className="flex items-center gap-1">
+                <FaLock className="inline" /> Log out
+              </button>
+            </div>
+
+            <div className="h-[25px] border-r-2 border-gray-600 mx-2"></div>
+
+            <div className="text-gray-300 hover:text-[#ff5c00]">
+              <Link to={ACCOUNT_ROUTE}><FaUser className="inline" /> My Account</Link>
+            </div>
+          </>
+        )}
 
         <div className="w-[70px] h-[50px] bg-gray-700 ml-8 text-white flex items-center justify-center">
           NEP
@@ -43,11 +78,12 @@ export default function Navbar() {
       {/* Header Part 2 */}
       <div className="flex items-center h-[100px] bg-[#181818] border-b border-gray-700">
         <div className="ml-[150px] mt-2">
+          <Link to={HOME_ROUTE}>
           <img
             className="h-30 w-auto object-contain"
             src="/images/logo.png"
             alt="logo"
-          />
+          /></Link>
         </div>
 
         <input

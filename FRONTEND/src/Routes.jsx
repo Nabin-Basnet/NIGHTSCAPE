@@ -5,18 +5,23 @@ import About from "./pages/About";
 import Contact from "./pages/Contact";
 import UserLayout from "./layouts/UserLayout";
 import LoginForm from "./auth/LoginPage";
+import SignupForm from "./auth/signup"; 
 import { ABOUT_ROUTE, 
         HOME_ROUTE, 
         PRODUCTS_ROUTE,
         CUSTOM_DESIGN_ROUTE,
         BEST_SELLER,
         OFFER_ROUTE,
+        SIGNUP_ROUTE,
+        LOGIN_ROUTE,
+        ACCOUNT_ROUTE,
      } from "./constants/navMenu";
 import SinglePageProduct from "./pages/SingleProductPage";
 import SingleProductPage from "./pages/SingleProductPage";
 import CustonDesign from "./pages/CustonDesign";
 import BestSeller from "./pages/BestSeller";
 import Offer from "./pages/Offer";
+import Account from "./pages/Account";
 
 const router=createBrowserRouter([
     {
@@ -78,8 +83,16 @@ const router=createBrowserRouter([
     },
  
     {
-        path: "/auth/login",
+        path: LOGIN_ROUTE,
         element: <LoginForm />
+    },
+    {
+        path: SIGNUP_ROUTE,
+        element: <SignupForm />
+    },
+    {
+        path: ACCOUNT_ROUTE,
+        element: <Account />
     }
     
 ]);
