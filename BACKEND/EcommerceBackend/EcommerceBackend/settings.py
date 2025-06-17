@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     # 'ecommerce',
     'rest_framework',
+    'corsheaders',
  
    
 ]
@@ -53,7 +54,11 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
+
+# Allow all origins (for development only!)
+CORS_ALLOW_ALL_ORIGINS = True
 
 ROOT_URLCONF = 'EcommerceBackend.urls'
 
