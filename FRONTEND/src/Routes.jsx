@@ -5,7 +5,7 @@ import About from "./pages/About";
 import Contact from "./pages/Contact";
 import UserLayout from "./layouts/UserLayout";
 import LoginForm from "./auth/LoginPage";
-import SignupForm from "./auth/signup"; 
+import SignupForm from "./auth/Signup"; 
 import { ABOUT_ROUTE, 
         HOME_ROUTE, 
         PRODUCTS_ROUTE,
