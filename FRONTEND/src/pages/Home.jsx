@@ -1,4 +1,22 @@
+import React, { useState, useEffect } from 'react'
+import AxiosInstance from '../Components/Axios'
+
 export default function Home() {
+  const [products, setProducts] = useState([])
+
+  const GetData = async () => {
+    try {
+      const response = await AxiosInstance.get('products/')
+      setProducts(response.data)
+    } catch (error) {
+      console.error('Error fetching products:', error)
+    }
+  }
+
+  useEffect(() => {
+    GetData()
+  }, [])
+
   return (
     <div className="font-sans text-gray-100 bg-gray-900 min-h-screen">
       {/* Hero Section */}
@@ -28,29 +46,42 @@ export default function Home() {
 
       {/* Featured Products */}
       <section className="bg-gray-900 py-16 px-4">
-  <h3 className="text-3xl font-bold text-center mb-12 text-white">Featured Products</h3>
-  <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10">
-    {[1, 2, 3, 4].map((item) => (
-      <div
-        key={item}
-        className="bg-gray-800 p-6 rounded-2xl shadow-md hover:shadow-xl transition duration-300 border border-gray-700"
-      >
-        <div className="h-48 bg-gray-700 rounded-lg mb-4 flex items-center justify-center">
-          <span className="text-white text-lg">Image {item}</span>
+        <h3 className="text-3xl font-bold text-center mb-12 text-white">Featured Products</h3>
+        <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10">
+          {products.length > 0 ? (
+            products.map((item) => (
+              <div
+                key={item.id}
+                className="bg-gray-800 p-6 rounded-2xl shadow-md hover:shadow-xl transition duration-300 border border-gray-700"
+              >
+                <div className="h-48 bg-gray-700 rounded-lg mb-4 flex items-center justify-center overflow-hidden">
+                  {item.image ? (
+                    <img
+                      src={`http://127.0.0.1:8000/${item.image}`}
+                      alt={item.name}
+                      className="object-cover h-full w-full"
+                    />
+                  ) : (
+                    <span className="text-white text-lg">No Image</span>
+                  )}
+                </div>
+                <h4 className="text-xl font-semibold text-white mb-1">{item.name}</h4>
+                <p className="text-gray-400 mb-3 text-sm">{item.description}</p>
+                <div className="flex justify-between items-center">
+                  <span className="text-blue-400 font-semibold text-lg">
+                    ${item.price.toFixed(2)}
+                  </span>
+                  <button className="bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium px-4 py-2 rounded-lg transition">
+                    Add to Cart
+                  </button>
+                </div>
+              </div>
+            ))
+          ) : (
+            <p className="text-gray-300 text-center col-span-full">No products found.</p>
+          )}
         </div>
-        <h4 className="text-xl font-semibold text-white mb-1">Premium Product {item}</h4>
-        <p className="text-gray-400 mb-3 text-sm">This is a short and compelling description of the product.</p>
-        <div className="flex justify-between items-center">
-          <span className="text-blue-400 font-semibold text-lg">$9.99</span>
-          <button className="bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium px-4 py-2 rounded-lg transition">
-            Add to Cart
-          </button>
-        </div>
-      </div>
-    ))}
-  </div>
-</section>
-
+      </section>
     </div>
   )
 }
