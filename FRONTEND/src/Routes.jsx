@@ -15,6 +15,7 @@ import { ABOUT_ROUTE,
         SIGNUP_ROUTE,
         LOGIN_ROUTE,
         ACCOUNT_ROUTE,
+        ADMIN_ROUTE,
      } from "./constants/navMenu";
 import SinglePageProduct from "./pages/SingleProductPage";
 import SingleProductPage from "./pages/SingleProductPage";
@@ -22,6 +23,8 @@ import CustonDesign from "./pages/CustonDesign";
 import BestSeller from "./pages/BestSeller";
 import Offer from "./pages/Offer";
 import Account from "./pages/Account";
+import MainContent from "./pages/AdminMain";
+import AdminLayout from "./layouts/AdminLayout";
 
 const router=createBrowserRouter([
     {
@@ -93,6 +96,16 @@ const router=createBrowserRouter([
     {
         path: ACCOUNT_ROUTE,
         element: <Account />
+    },
+    {
+        path:ADMIN_ROUTE,
+        element:<AdminLayout/>,
+        children:[
+            {
+                path:"main",
+                element:<MainContent/>
+            },
+        ]
     }
     
 ]);
