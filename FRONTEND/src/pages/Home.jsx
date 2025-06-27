@@ -57,7 +57,7 @@ export default function Home() {
                 <div className="h-48 bg-gray-700 rounded-lg mb-4 flex items-center justify-center overflow-hidden">
                   {item.image ? (
                     <img
-                      src={`http://127.0.0.1:8000/${item.image}`}
+                      src={`http://127.0.0.1:8000/media/${item.image}`}
                       alt={item.name}
                       className="object-cover h-full w-full"
                     />

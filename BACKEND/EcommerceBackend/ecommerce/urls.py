@@ -1,3 +1,5 @@
+from django.conf import settings
+from django.conf.urls.static import static
 from django.urls import include,path
 from ecommerce.views import landing
 from .views import ProductViewSet, CategoryViewSet, CartViewSet, OrderViewSet, OrderItemViewSet
@@ -12,4 +14,4 @@ router.register(r'orders', OrderViewSet)
 urlpatterns=[
     path("",landing),
     path('api/', include(router.urls)),
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
