@@ -23,7 +23,7 @@ import CustonDesign from "./pages/CustonDesign";
 import BestSeller from "./pages/BestSeller";
 import Offer from "./pages/Offer";
 import Account from "./pages/Account";
-import MainContent from "./Admin/pages/AdminMain";
+import MainContent from "./Admin/Pages/AdminMain";
 import AdminLayout from "./Admin/Layouts/AdminLayout";
 
 const router=createBrowserRouter([
