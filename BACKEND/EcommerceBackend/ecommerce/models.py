@@ -20,7 +20,7 @@ class User(models.Model):
 class Category(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
-    image = models.ImageField(upload_to='media/categories/', blank=True, null=True)
+    image = models.ImageField(upload_to='categories/', blank=True, null=True)
     parent = models.ForeignKey('self', null=True, blank=True, on_delete=models.SET_NULL, related_name='subcategories')
 
     def __str__(self):
@@ -30,7 +30,7 @@ class Category(models.Model):
 class Brand(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
-    logo = models.ImageField(upload_to='media/brands/', blank=True, null=True)
+    logo = models.ImageField(upload_to='brands/', blank=True, null=True)
 
     def __str__(self):
         return self.name
@@ -45,7 +45,7 @@ class Product(models.Model):
     brand = models.ForeignKey(Brand, on_delete=models.SET_NULL, null=True)
     discount = models.FloatField(blank=True, null=True)
     rating = models.FloatField(default=0.0)
-    image = models.ImageField(upload_to='media/products/', blank=True, null=True)  # main image (optional)
+    image = models.ImageField(upload_to='products/', blank=True, null=True)  # main image (optional)
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -55,7 +55,7 @@ class Product(models.Model):
 # 5. Product Images (for multiple images per product)
 class ProductImage(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images')
-    image = models.ImageField(upload_to='media/product_images/')
+    image = models.ImageField(upload_to='product_images/')
     alt_text = models.CharField(max_length=255, blank=True, null=True)
 
     def __str__(self):

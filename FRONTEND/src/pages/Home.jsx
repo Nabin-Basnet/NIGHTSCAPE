@@ -35,13 +35,14 @@ export default function Home() {
           {["Daily Use", "Decorative", "Neon Boards"].map((cat) => (
             <div
               key={cat}
-              className="bg-gray-800 p-6 rounded-xl shadow-lg hover:shadow-2xl hover:bg-gray-700 transition duration-300 text-center border border-gray-700"
+              className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition duration-300 text-center border border-gray-200"
             >
-              <h4 className="text-lg font-medium text-white">{cat}</h4>
-              <p className="text-gray-400 mt-2">Explore {cat} lighting options</p>
+              <h4 className="text-lg font-medium text-gray-900">{cat}</h4>
+              <p className="text-gray-600 mt-2">Explore {cat} lighting options</p>
             </div>
           ))}
         </div>
+
       </section>
 
       {/* Featured Products */}
@@ -55,16 +56,17 @@ export default function Home() {
                 className="bg-gray-800 p-6 rounded-2xl shadow-md hover:shadow-xl transition duration-300 border border-gray-700"
               >
                 <div className="h-48 bg-gray-700 rounded-lg mb-4 flex items-center justify-center overflow-hidden">
-                  {item.image ? (
-                    <img
-                      src={`http://127.0.0.1:8000/media/${item.image}`}
-                      alt={item.name}
-                      className="object-cover h-full w-full"
-                    />
-                  ) : (
-                    <span className="text-white text-lg">No Image</span>
-                  )}
+                  <img
+                    src={`http://127.0.0.1:8000/media/products/nz.jpg`}
+                    alt={item.name}
+                    className="object-cover h-full w-full"
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = 'https://placehold.co/300x300?text=No+Image';
+                    }}
+                  />
                 </div>
+
                 <h4 className="text-xl font-semibold text-white mb-1">{item.name}</h4>
                 <p className="text-gray-400 mb-3 text-sm">{item.description}</p>
                 <div className="flex justify-between items-center">

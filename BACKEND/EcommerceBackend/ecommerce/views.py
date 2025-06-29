@@ -10,6 +10,8 @@ from .serializers import (UserSerializer,CategorySerializer,BrandSerializer,
                           PaymentSerializer,ReviewSerializer,ReturnSerializer,
                           FeaturedProductSerializer)
 
+from .Paginations import CustomPagination
+
 
 # Create your views here.
 def landing(request):
@@ -18,8 +20,10 @@ def landing(request):
 
 
 class ProductViewSet(viewsets.ModelViewSet):
-    queryset = Product.objects.all()
+    queryset = Product.objects.all().order_by('id')  # 👈 Added ordering by 'id'
     serializer_class = ProductSerializer
+    # pagination_class = CustomPagination
+
 
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
