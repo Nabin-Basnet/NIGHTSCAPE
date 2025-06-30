@@ -2,7 +2,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import include,path
 from ecommerce.views import landing
-from .views import ProductViewSet, CategoryViewSet, CartViewSet, OrderViewSet, OrderItemViewSet
+from .views import ProductViewSet, CategoryViewSet, CartViewSet, OrderViewSet, OrderItemViewSet,BrandViewSet
 from rest_framework.routers import DefaultRouter
 
 router = DefaultRouter()
@@ -10,6 +10,7 @@ router.register(r'products', ProductViewSet)
 router.register(r'categories', CategoryViewSet)
 router.register(r'carts', CartViewSet)
 router.register(r'orders', OrderViewSet)
+router.register(r'brand', BrandViewSet)
 
 urlpatterns=[
     path("",landing),

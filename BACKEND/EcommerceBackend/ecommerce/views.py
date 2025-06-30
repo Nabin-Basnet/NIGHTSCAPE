@@ -41,3 +41,7 @@ class OrderItemViewSet(viewsets.ModelViewSet):
     queryset = OrderItem.objects.all()
     serializer_class = OrderItemSerializer
 
+class BrandViewSet(viewsets.ModelViewSet):
+    queryset=Brand.objects.all()
+    serializer_class=BrandSerializer
+
