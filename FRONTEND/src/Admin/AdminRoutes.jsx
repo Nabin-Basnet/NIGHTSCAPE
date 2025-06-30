@@ -2,6 +2,7 @@ import React from 'react';
 import { Outlet } from 'react-router-dom';
 import MainContent from './Pages/AdminMain';
 import AdminProducts from './Pages/AdminProduct';       // example admin page
+import AdminCategory from './Pages/AdminCategory';
 // import ProductAdd from '../Pages/ProductAdd';
 // import ProductEdit from '../Pages/ProductEdit';
 
@@ -21,6 +22,10 @@ const adminRoutesConfig = [
   {
     path: "products",
     element: <AdminProducts />
+  },
+  {
+    path: "category",
+    element: <AdminCategory />
   },
   // {
   //   path: "products/add",
