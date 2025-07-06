@@ -69,6 +69,12 @@ class CartSerializer(serializers.ModelSerializer):
     class Meta:
         model = Cart
         fields = '__all__'
+# class CartSerializer(serializers.ModelSerializer):
+#     user = UserSerializer(read_only=True) 
+#     product = serializers.PrimaryKeyRelatedField(queryset=Product.objects.all()) 
+#     class Meta:
+#         model = Cart
+#         fields = '__all__'
 
 
 class WishlistSerializer(serializers.ModelSerializer):

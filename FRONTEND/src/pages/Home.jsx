@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
-import AxiosInstance from '../Components/Axios'
+import AxiosInstance from '../components/Axios'
+// import AxiosInstance from '../Components/Axios'
 
 export default function Home() {
   const [products, setProducts] = useState([])
@@ -57,7 +58,7 @@ export default function Home() {
               >
                 <div className="h-48 bg-gray-700 rounded-lg mb-4 flex items-center justify-center overflow-hidden">
                   <img
-                    src={`http://127.0.0.1:8000/media/products/nz.jpg`}
+                    src={item.image}
                     alt={item.name}
                     className="object-cover h-full w-full"
                     onError={(e) => {

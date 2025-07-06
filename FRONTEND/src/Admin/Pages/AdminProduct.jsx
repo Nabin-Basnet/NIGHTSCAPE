@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import AxiosInstance from "../../Components/Axios";
+import AxiosInstance from "../../components/Axios";
 
 export default function AdminProductList() {
   const [products, setProducts] = useState([]);
@@ -23,18 +23,14 @@ export default function AdminProductList() {
     fetchProducts(search);
   }, [search]);
 
-  // Placeholder edit handler
   const handleEdit = (product) => {
     alert(`Edit product ID ${product.id} - implement your edit logic here`);
-    // For example, open a modal with product data for editing
   };
 
-  // Delete handler with confirmation
   const handleDelete = async (productId) => {
     if (window.confirm("Are you sure you want to delete this product?")) {
       try {
         await AxiosInstance.delete(`products/${productId}/`);
-        // Refresh list after delete
         fetchProducts(search);
       } catch (error) {
         console.error("Error deleting product:", error);
@@ -67,11 +63,11 @@ export default function AdminProductList() {
               <th className="border border-gray-300 p-2">Category</th>
               <th className="border border-gray-300 p-2">Brand</th>
               <th className="border border-gray-300 p-2">Price</th>
-              <th className="border border-gray-300 p-2">Stock_quantity</th>
+              <th className="border border-gray-300 p-2">Stock Qty</th>
               <th className="border border-gray-300 p-2">Discount</th>
               <th className="border border-gray-300 p-2">Description</th>
-              <th className="border border-gray-300 p-2">Created_at</th>
-              <th className="border border-gray-300 p-2">Updated_at</th>
+              <th className="border border-gray-300 p-2">Created At</th>
+              <th className="border border-gray-300 p-2">Updated At</th>
               <th className="border border-gray-300 p-2">Actions</th>
             </tr>
           </thead>
@@ -82,7 +78,7 @@ export default function AdminProductList() {
                 <td className="border border-gray-300 p-2">
                   {p.image ? (
                     <img
-                      src={`http://127.0.0.1:8000/media/categories/one_piece.jpg`} // assuming p.image is like '/media/products/xyz.jpg'
+                      src={p.image}
                       alt={p.name}
                       className="h-16 w-16 object-cover rounded"
                       onError={(e) => {
@@ -95,14 +91,14 @@ export default function AdminProductList() {
                   )}
                 </td>
                 <td className="border border-gray-300 p-2">{p.name}</td>
-                <td className="border border-gray-300 p-2">{p.category?.name}</td>
-                <td className="border border-gray-300 p-2">{p.brand?.name}</td>
+                <td className="border border-gray-300 p-2">{p.category?.name || 'N/A'}</td>
+                <td className="border border-gray-300 p-2">{p.brand?.name || 'N/A'}</td>
                 <td className="border border-gray-300 p-2">${p.price.toFixed(2)}</td>
                 <td className="border border-gray-300 p-2">{p.stock_quantity}</td>
-                <td className="border border-gray-300 p-2">{p.discount ? `${p.discount}%` : "null"}</td>
+                <td className="border border-gray-300 p-2">{p.discount ? `${p.discount}%` : "0%"}</td>
                 <td className="border border-gray-300 p-2">{p.description}</td>
-                <td className="border border-gray-300 p-2">{p.created_at}</td>
-                <td className="border border-gray-300 p-2">{p.updated_at}</td>
+                <td className="border border-gray-300 p-2">{new Date(p.created_at).toLocaleString()}</td>
+                <td className="border border-gray-300 p-2">{new Date(p.updated_at).toLocaleString()}</td>
                 <td className="border border-gray-300 p-2 space-x-2">
                   <button
                     onClick={() => handleEdit(p)}

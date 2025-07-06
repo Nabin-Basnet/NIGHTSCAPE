@@ -12,13 +12,30 @@ import {
   FaComments,
   FaHeart,
   FaClipboardList,
-  FaUserCheck,
 } from 'react-icons/fa';
+
+import {
+  ADMIN_PRODUCT,
+  ADMIN_CATEGORY,
+  ADMIN_BRAND,
+  ADMIN_ORDERS,
+  ADMIN_ORDER_ITEMS,
+  ADMIN_CART,
+  ADMIN_ADDRESS,
+  ADMIN_FEATURED_PRODUCTS,
+  ADMIN_RETURN,
+  ADMIN_USERS,
+  ADMIN_WISHLIST,
+  ADMIN_REVIEW,
+} from '../Constants/AdminMenu';
 
 export default function Sidebar() {
   const { pathname } = useLocation();
 
-  const isActive = (path) => (pathname === path ? 'bg-[#2e3a59]' : '');
+  const isActive = (path) =>
+    pathname === `/admin/${path}` || (path === "" && pathname === "/admin")
+      ? 'bg-[#2e3a59]'
+      : '';
 
   return (
     <aside className="w-64 min-h-screen bg-[#202942] text-white">
@@ -29,104 +46,104 @@ export default function Sidebar() {
 
       <nav className="flex flex-col p-4 gap-1">
         <Link
-          to="/admin/main"
-          className={`flex items-center gap-3 px-4 py-2 rounded hover:bg-[#313b55] ${isActive('/admin/main')}`}
+          to="/admin"
+          className={`flex items-center gap-3 px-4 py-2 rounded hover:bg-[#313b55] ${isActive("")}`}
         >
           <FaTachometerAlt />
           <span>Dashboard</span>
         </Link>
 
         <Link
-          to="/admin/shares"
-          className={`flex items-center gap-3 px-4 py-2 rounded hover:bg-[#313b55] ${isActive('/admin/shares')}`}
+          to={`/admin/${ADMIN_PRODUCT}`}
+          className={`flex items-center gap-3 px-4 py-2 rounded hover:bg-[#313b55] ${isActive(ADMIN_PRODUCT)}`}
         >
           <FaBoxOpen />
           <span>Products</span>
         </Link>
 
         <Link
-          to="/admin/history"
-          className={`flex items-center gap-3 px-4 py-2 rounded hover:bg-[#313b55] ${isActive('/admin/history')}`}
+          to={`/admin/${ADMIN_CATEGORY}`}
+          className={`flex items-center gap-3 px-4 py-2 rounded hover:bg-[#313b55] ${isActive(ADMIN_CATEGORY)}`}
         >
           <FaThList />
           <span>Category</span>
         </Link>
 
         <Link
-          to="/admin/brand"
-          className={`flex items-center gap-3 px-4 py-2 rounded hover:bg-[#313b55] ${isActive('/admin/brand')}`}
+          to={`/admin/${ADMIN_BRAND}`}
+          className={`flex items-center gap-3 px-4 py-2 rounded hover:bg-[#313b55] ${isActive(ADMIN_BRAND)}`}
         >
           <FaTags />
           <span>Brand</span>
         </Link>
 
         <Link
-          to="/admin/orders"
-          className={`flex items-center gap-3 px-4 py-2 rounded hover:bg-[#313b55] ${isActive('/admin/orders')}`}
+          to={`/admin/${ADMIN_ORDERS}`}
+          className={`flex items-center gap-3 px-4 py-2 rounded hover:bg-[#313b55] ${isActive(ADMIN_ORDERS)}`}
         >
           <FaClipboardList />
           <span>Orders</span>
         </Link>
 
         <Link
-          to="/admin/order-items"
-          className={`flex items-center gap-3 px-4 py-2 rounded hover:bg-[#313b55] ${isActive('/admin/order-items')}`}
+          to={`/admin/${ADMIN_ORDER_ITEMS}`}
+          className={`flex items-center gap-3 px-4 py-2 rounded hover:bg-[#313b55] ${isActive(ADMIN_ORDER_ITEMS)}`}
         >
           <FaBoxOpen />
           <span>Order Items</span>
         </Link>
 
         <Link
-          to="/admin/cart"
-          className={`flex items-center gap-3 px-4 py-2 rounded hover:bg-[#313b55] ${isActive('/admin/cart')}`}
+          to={`/admin/${ADMIN_CART}`}
+          className={`flex items-center gap-3 px-4 py-2 rounded hover:bg-[#313b55] ${isActive(ADMIN_CART)}`}
         >
           <FaShoppingCart />
           <span>Cart</span>
         </Link>
 
         <Link
-          to="/admin/address"
-          className={`flex items-center gap-3 px-4 py-2 rounded hover:bg-[#313b55] ${isActive('/admin/address')}`}
+          to={`/admin/${ADMIN_ADDRESS}`}
+          className={`flex items-center gap-3 px-4 py-2 rounded hover:bg-[#313b55] ${isActive(ADMIN_ADDRESS)}`}
         >
           <FaMapMarkerAlt />
           <span>Address</span>
         </Link>
 
         <Link
-          to="/admin/featured-product"
-          className={`flex items-center gap-3 px-4 py-2 rounded hover:bg-[#313b55] ${isActive('/admin/featured-product')}`}
+          to={`/admin/${ADMIN_FEATURED_PRODUCTS}`}
+          className={`flex items-center gap-3 px-4 py-2 rounded hover:bg-[#313b55] ${isActive(ADMIN_FEATURED_PRODUCTS)}`}
         >
           <FaStar />
           <span>Featured Product</span>
         </Link>
 
         <Link
-          to="/admin/return"
-          className={`flex items-center gap-3 px-4 py-2 rounded hover:bg-[#313b55] ${isActive('/admin/return')}`}
+          to={`/admin/${ADMIN_RETURN}`}
+          className={`flex items-center gap-3 px-4 py-2 rounded hover:bg-[#313b55] ${isActive(ADMIN_RETURN)}`}
         >
           <FaUndo />
           <span>Return</span>
         </Link>
 
         <Link
-          to="/admin/users"
-          className={`flex items-center gap-3 px-4 py-2 rounded hover:bg-[#313b55] ${isActive('/admin/users')}`}
+          to={`/admin/${ADMIN_USERS}`}
+          className={`flex items-center gap-3 px-4 py-2 rounded hover:bg-[#313b55] ${isActive(ADMIN_USERS)}`}
         >
           <FaUsers />
           <span>Users</span>
         </Link>
 
         <Link
-          to="/admin/review"
-          className={`flex items-center gap-3 px-4 py-2 rounded hover:bg-[#313b55] ${isActive('/admin/review')}`}
+          to={`/admin/${ADMIN_REVIEW}`}
+          className={`flex items-center gap-3 px-4 py-2 rounded hover:bg-[#313b55] ${isActive(ADMIN_REVIEW)}`}
         >
           <FaComments />
           <span>Review</span>
         </Link>
 
         <Link
-          to="/admin/wishlists"
-          className={`flex items-center gap-3 px-4 py-2 rounded hover:bg-[#313b55] ${isActive('/admin/wishlists')}`}
+          to={`/admin/${ADMIN_WISHLIST}`}
+          className={`flex items-center gap-3 px-4 py-2 rounded hover:bg-[#313b55] ${isActive(ADMIN_WISHLIST)}`}
         >
           <FaHeart />
           <span>Wishlists</span>

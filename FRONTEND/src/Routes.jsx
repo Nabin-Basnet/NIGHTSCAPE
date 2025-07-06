@@ -27,7 +27,9 @@ import {
   LOGIN_ROUTE,
   ACCOUNT_ROUTE,
   ADMIN_ROUTE,
+  CART_ROUTE,
 } from "./constants/navMenu";
+import CartPage from "./pages/Cart";
 
 const router = createBrowserRouter([
   {
@@ -89,6 +91,10 @@ const router = createBrowserRouter([
   {
     path: ACCOUNT_ROUTE,
     element: <Account />,
+  },
+  {
+    path: CART_ROUTE,
+    element: <CartPage />,
   },
   {
     path: ADMIN_ROUTE,

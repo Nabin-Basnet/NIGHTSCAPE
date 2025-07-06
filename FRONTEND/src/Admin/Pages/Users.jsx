@@ -1,9 +1,9 @@
 import React from 'react'
 
-export default function Cart() {
+export default function Users() {
   return (
     <div>
-      <h1>cart</h1>
+      <h1>users</h1>
     </div>
   )
 }

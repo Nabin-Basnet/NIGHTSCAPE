@@ -10,7 +10,7 @@ from .serializers import (UserSerializer,CategorySerializer,BrandSerializer,
                           PaymentSerializer,ReviewSerializer,ReturnSerializer,
                           FeaturedProductSerializer)
 
-from .Paginations import CustomPagination
+# from .Paginations import CustomPagination
 
 
 # Create your views here.
