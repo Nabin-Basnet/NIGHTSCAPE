@@ -12,7 +12,7 @@ import {
   ShoppingCart,
   ChevronDown,
 } from "lucide-react";
-import AxiosInstance from "../components/Axios";
+import AxiosInstance from "../Components/Axios";
 
 const Products = () => {
   const navigate = useNavigate();
