@@ -4,8 +4,6 @@ import MainContent from './Pages/AdminMain';
 import AdminProducts from './Pages/AdminProduct';
 import AdminCategory from './Pages/AdminCategory';
 import AdminBrand from './Pages/AdminBrand';
-
-import Order from './Pages/Order';
 import OrderItem from './Pages/Order_item';
 import Cart from './Pages/Cart';
 import Address from './Pages/Address';
@@ -14,6 +12,7 @@ import Return from './Pages/Return';
 import Users from './Pages/Users';
 import Review from './Pages/Review';
 import Wishlist from './Pages/Wishlist';
+import Order from './Pages/Order';
 
 import {
   ADMIN_PRODUCT,
