@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import AxiosInstance from "../../components/Axios";
+import AxiosInstance from "../../Components/Axios";
 import { ADMIN_PRODUCT, ADD_PRODUCT } from "../Constants/AdminMenu";
 
 export default function AdminProductList() {
