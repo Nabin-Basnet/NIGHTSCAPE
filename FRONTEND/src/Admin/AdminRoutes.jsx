@@ -12,7 +12,7 @@ import Return from './Pages/Return';
 import Users from './Pages/Users';
 import Review from './Pages/Review';
 import Wishlist from './Pages/Wishlist';
-import Order from './Pages/Order';
+import Order from './Pages/Orders';
 
 import {
   ADMIN_PRODUCT,
