@@ -12,7 +12,10 @@ const ADMIN_USERS="users"
 const ADMIN_REVIEW="review"
 const ADMIN_WISHLIST="wishlists"
 
+const ADD_PRODUCT="add"
+
 export{
+    ADD_PRODUCT,
     ADMIN_ADDRESS,
     ADMIN_BRAND,
     ADMIN_CART,

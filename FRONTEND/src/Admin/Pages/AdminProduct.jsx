@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import AxiosInstance from "../../components/Axios";
+import { ADMIN_PRODUCT, ADD_PRODUCT } from "../Constants/AdminMenu";
 
 export default function AdminProductList() {
   const [products, setProducts] = useState([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const fetchProducts = (searchTerm) => {
     setLoading(true);
@@ -41,8 +44,18 @@ export default function AdminProductList() {
 
   return (
     <div className="p-6">
-      <h1 className="text-3xl font-bold mb-6">Admin Products</h1>
+      {/* Header and Add Button */}
+      <div className="flex items-center justify-between mb-4">
+        <h1 className="text-3xl font-bold">Admin Products</h1>
+        <button
+          onClick={() => navigate(`/${ADMIN_PRODUCT}/${ADD_PRODUCT}`)} 
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+        >
+          + Add Product
+        </button>
+      </div>
 
+      {/* Search Box */}
       <input
         type="text"
         placeholder="Search products..."
@@ -51,6 +64,7 @@ export default function AdminProductList() {
         onChange={(e) => setSearch(e.target.value)}
       />
 
+      {/* Product Table */}
       {loading ? (
         <p>Loading...</p>
       ) : products.length > 0 ? (
@@ -91,8 +105,8 @@ export default function AdminProductList() {
                   )}
                 </td>
                 <td className="border border-gray-300 p-2">{p.name}</td>
-                <td className="border border-gray-300 p-2">{p.category?.name || 'N/A'}</td>
-                <td className="border border-gray-300 p-2">{p.brand?.name || 'N/A'}</td>
+                <td className="border border-gray-300 p-2">{p.category?.name || "N/A"}</td>
+                <td className="border border-gray-300 p-2">{p.brand?.name || "N/A"}</td>
                 <td className="border border-gray-300 p-2">${p.price.toFixed(2)}</td>
                 <td className="border border-gray-300 p-2">{p.stock_quantity}</td>
                 <td className="border border-gray-300 p-2">{p.discount ? `${p.discount}%` : "0%"}</td>

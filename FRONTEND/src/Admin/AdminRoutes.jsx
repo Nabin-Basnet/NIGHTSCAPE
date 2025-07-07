@@ -26,8 +26,11 @@ import {
   ADMIN_RETURN,
   ADMIN_USERS,
   ADMIN_REVIEW,
-  ADMIN_WISHLIST
+  ADMIN_WISHLIST,
+  ADD_PRODUCT
 } from './Constants/AdminMenu';
+import { Children } from 'react';
+import ProductAdd from './Features/Products/Add_Product';
 
 export const AdminRoutes = () => <Outlet />;
 
@@ -39,6 +42,12 @@ export const adminRoutesConfig = [
   {
     path: ADMIN_PRODUCT, // "products"
     element: <AdminProducts />,
+    children:[
+      {
+        path:ADD_PRODUCT,
+        element:<ProductAdd/>
+      }
+    ]
   },
   {
     path: ADMIN_CATEGORY,

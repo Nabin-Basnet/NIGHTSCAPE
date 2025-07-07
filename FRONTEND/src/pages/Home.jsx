@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import AxiosInstance from '../components/Axios'
+import AxiosInstance from '../Components/Axios'
 // import AxiosInstance from '../Components/Axios'
 
 export default function Home() {
