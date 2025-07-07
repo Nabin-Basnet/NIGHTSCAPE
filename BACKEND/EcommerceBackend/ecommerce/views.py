@@ -45,3 +45,7 @@ class BrandViewSet(viewsets.ModelViewSet):
     queryset=Brand.objects.all()
     serializer_class=BrandSerializer
 
+class WishlistViewSet(viewsets.ModelViewSet):
+    queryset = Wishlist.objects.all()
+    serializer_class = WishlistSerializer
+
