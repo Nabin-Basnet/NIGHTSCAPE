@@ -14,7 +14,8 @@ import {
   BEST_SELLER,
   SIGNUP_ROUTE,
   LOGIN_ROUTE,
-  ACCOUNT_ROUTE, // define this in constants if not already
+  ACCOUNT_ROUTE,
+  CART_ROUTE, // define this in constants if not already
 } from "../constants/navMenu";
 
 export default function Navbar() {
@@ -97,7 +98,7 @@ export default function Navbar() {
         </button>
 
         <div className="mt-[35px] ml-[80px]">
-          <BsCart4 size={35} />
+          <Link to={CART_ROUTE}><BsCart4 size={35} /></Link>
         </div>
       </div>
 

@@ -18,6 +18,7 @@ export default function ProductAdd() {
   // Load categories and brands on mount
   useEffect(() => {
     fetchCategories();
+    console.log("add porduct page called")
     fetchBrands();
   }, []);
 

@@ -10,7 +10,6 @@ import {
   Star,
   Heart,
   ShoppingCart,
-  ChevronDown,
 } from "lucide-react";
 import AxiosInstance from "../Components/Axios";
 
@@ -26,7 +25,7 @@ const Products = () => {
   const [selectedBrands, setSelectedBrands] = useState([]);
   const [showFilters, setShowFilters] = useState(false);
 
-  // ✅ Fetch products from API
+  // Fetch products once on mount
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -39,6 +38,7 @@ const Products = () => {
     fetchProducts();
   }, []);
 
+  // Toggle brand selection
   const toggleBrand = (brandId) => {
     setSelectedBrands((prev) =>
       prev.includes(brandId)
@@ -47,7 +47,7 @@ const Products = () => {
     );
   };
 
-  // ✅ Filtered Products
+  // Filter products based on search, category, price and brand
   const filteredProducts = products.filter((product) => {
     const matchesSearch = product.name
       .toLowerCase()
@@ -63,6 +63,7 @@ const Products = () => {
     return matchesSearch && matchesCategory && matchesPrice && matchesBrand;
   });
 
+  // Clear all filters
   const clearAllFilters = () => {
     setSearchQuery("");
     setSelectedCategory("all");
@@ -70,26 +71,25 @@ const Products = () => {
     setSelectedBrands([]);
   };
 
+  // Star rating display component
   const StarRating = ({ rating }) => (
     <div className="flex items-center">
       {[...Array(5)].map((_, i) => (
         <Star
           key={i}
           className={`w-4 h-4 ${
-            i < Math.floor(rating)
-              ? "text-yellow-400 fill-current"
-              : "text-gray-600"
+            i < Math.floor(rating) ? "text-yellow-400 fill-current" : "text-gray-600"
           }`}
         />
       ))}
     </div>
   );
 
-  // ✅ Add to Cart Function
+  // Add product to cart
   const handleAddToCart = async (productId) => {
     try {
       await AxiosInstance.post("carts/", {
-         product_id: productId,
+        product_id: productId,
         quantity: 1,
       });
       navigate("/cart");
@@ -99,11 +99,14 @@ const Products = () => {
     }
   };
 
+  // Product card component
   const ProductCard = ({ product }) => (
     <div
       className={`bg-gray-800 rounded-lg overflow-hidden hover:bg-gray-750 transition-colors group ${
         viewMode === "list" ? "flex gap-4" : ""
       }`}
+      onClick={() => navigate(`/products/${product.id}`)} // Navigate to product detail on click
+      style={{ cursor: "pointer" }}
     >
       <div className={`relative ${viewMode === "list" ? "w-48 flex-shrink-0" : ""}`}>
         <img
@@ -124,7 +127,7 @@ const Products = () => {
           </span>
         )}
         <div className="absolute inset-0 bg-black/30 bg-opacity-0 group-hover:bg-opacity-20 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100">
-          <div className="flex gap-2">
+          <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
             <button className="p-2 bg-white text-gray-900 rounded-full hover:bg-gray-100">
               <Heart className="w-4 h-4" />
             </button>
@@ -151,9 +154,7 @@ const Products = () => {
         </div>
 
         <div className="flex items-center gap-2 mb-3">
-          <span className="text-lg font-bold text-green-400">
-            ${product.price}
-          </span>
+          <span className="text-lg font-bold text-green-400">${product.price}</span>
           {product.original_price && (
             <span className="text-sm text-gray-500 line-through">
               ${product.original_price}
@@ -163,7 +164,10 @@ const Products = () => {
 
         {viewMode === "list" && (
           <button
-            onClick={() => handleAddToCart(product.id)}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleAddToCart(product.id);
+            }}
             className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg font-semibold transition-colors"
           >
             Add to Cart
@@ -213,18 +217,16 @@ const Products = () => {
                   <button
                     onClick={() => setSelectedCategory("all")}
                     className={`w-full text-left px-3 py-2 rounded-lg ${
-                      selectedCategory === "all"
-                        ? "bg-blue-600"
-                        : "hover:bg-gray-700"
+                      selectedCategory === "all" ? "bg-blue-600" : "hover:bg-gray-700"
                     }`}
                   >
                     All Products
                   </button>
-                  {/* Add more categories if needed */}
+                  {/* Add more categories here if needed */}
                 </div>
               </div>
 
-              {/* Price */}
+              {/* Price Range */}
               <div className="mb-6">
                 <h3 className="text-lg font-semibold mb-3">Price Range</h3>
                 <div className="flex items-center gap-2">
@@ -250,10 +252,10 @@ const Products = () => {
                 </div>
               </div>
 
-              {/* Brands */}
+              {/* Brands (Placeholder for future brand filters) */}
               <div className="mb-6">
                 <h3 className="text-lg font-semibold mb-3">Brands</h3>
-                {/* Add brands if needed */}
+                {/* Implement brand filter UI here if needed */}
               </div>
 
               <button
@@ -265,7 +267,7 @@ const Products = () => {
             </div>
           </div>
 
-          {/* Main */}
+          {/* Main content */}
           <div className="flex-1">
             {/* Toolbar */}
             <div className="flex justify-between items-center mb-6">
@@ -316,7 +318,7 @@ const Products = () => {
               </div>
             </div>
 
-            {/* Product Grid */}
+            {/* Products grid/list */}
             <div
               className={`grid gap-6 ${
                 viewMode === "grid"

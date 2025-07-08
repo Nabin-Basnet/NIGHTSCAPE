@@ -73,10 +73,10 @@ const router = createBrowserRouter([
         path: "contact",
         element: <Contact />,
       },
-      {
-        path: "product",
-        element: <SinglePageProduct />,
-      },
+      // {
+      //   path: "sinproduct",
+      //   element: <SinglePageProduct />,
+      // },
     ],
   },
 

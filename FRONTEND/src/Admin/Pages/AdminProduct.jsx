@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import AxiosInstance from "../../Components/Axios";
+import AxiosInstance from "../../Components/Axios";   
 import { ADMIN_PRODUCT, ADD_PRODUCT } from "../Constants/AdminMenu";
 
 export default function AdminProductList() {
@@ -48,7 +48,7 @@ export default function AdminProductList() {
       <div className="flex items-center justify-between mb-4">
         <h1 className="text-3xl font-bold">Admin Products</h1>
         <button
-          onClick={() => navigate(`/${ADMIN_PRODUCT}/${ADD_PRODUCT}`)} 
+          onClick={() => navigate(`/admin/${ADD_PRODUCT}`)} 
           className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
         >
           + Add Product

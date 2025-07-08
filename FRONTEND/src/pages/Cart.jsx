@@ -5,8 +5,13 @@ const CartPage = () => {
   const [cart, setCart] = useState([]);
 
   const fetchCart = async () => {
-    const res = await getCart();
-    setCart(res.data);
+    try {
+      const res = await getCart();
+      setCart(res.data || []);
+    } catch (error) {
+      console.error("Failed to fetch cart:", error);
+      setCart([]);
+    }
   };
 
   const handleRemove = async (id) => {
@@ -25,10 +30,9 @@ const CartPage = () => {
     fetchCart();
   }, []);
 
-  const total = cart.reduce(
-    (acc, item) => acc + item.product.price * item.quantity,
-    0
-  );
+  const total = Array.isArray(cart)
+    ? cart.reduce((acc, item) => acc + item.product.price * item.quantity, 0)
+    : 0;
 
   return (
     <div className="max-w-5xl mx-auto p-6">

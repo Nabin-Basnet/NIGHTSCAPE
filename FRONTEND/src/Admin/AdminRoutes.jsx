@@ -42,13 +42,11 @@ export const adminRoutesConfig = [
   {
     path: ADMIN_PRODUCT, // "products"
     element: <AdminProducts />,
-    children:[
-      {
+  },
+  {
         path:ADD_PRODUCT,
         element:<ProductAdd/>
-      }
-    ]
-  },
+      },
   {
     path: ADMIN_CATEGORY,
     element: <AdminCategory />,
