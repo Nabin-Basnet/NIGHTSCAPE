@@ -1,102 +1,83 @@
-import { useState } from "react";
-import axiosInstance from "../api/axios";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import AxiosInstance from "../Components/Axios";
+import { HOME_ROUTE } from "../constants/navMenu";
+import { jwtDecode } from "jwt-decode";
 
-export default function LoginForm() {
+const LoginForm = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState("");
+  const navigate = useNavigate();
 
-  const handleLogin = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
 
     try {
-      const response = await axiosInstance.post("/token/", {
+      const response = await AxiosInstance.post("/token/", {
         email,
         password,
       });
 
       const { access, refresh } = response.data;
 
-      // Store tokens in localStorage or cookies (handle "remember me" here)
-      if (rememberMe) {
-        localStorage.setItem("access_token", access);
-        localStorage.setItem("refresh_token", refresh);
-      } else {
-        localStorage.setItem("access_token", access);
-      }
+      // ✅ Store tokens correctly
+      localStorage.setItem("access_token", access);
+      localStorage.setItem("refresh_token", refresh);
 
-      // Set default auth header for future requests
-      axiosInstance.defaults.headers.common["Authorization"] = `Bearer ${access}`;
+      // Optional: decode token and save user info
+      const decoded = jwtDecode(access);
+      localStorage.setItem("user_role", decoded.role);
 
-      console.log("Login successful!");
-      // Redirect user or update UI
+      // Optional: set header immediately (although Axios interceptor will handle it)
+      AxiosInstance.defaults.headers.common["Authorization"] = `Bearer ${access}`;
+
+      navigate(HOME_ROUTE);
     } catch (err) {
-      setError("Invalid credentials. Please try again.");
+      console.error(err);
+      setError("Invalid email or password");
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <form
-        onSubmit={handleLogin}
-        className="bg-white p-8 rounded-2xl shadow-md w-full max-w-sm"
-      >
-        <h2 className="text-2xl font-bold mb-6 text-center text-gray-700">
-          Login
-        </h2>
+    <div className="max-w-md mx-auto mt-10 p-6 border rounded shadow">
+      <h2 className="text-2xl font-bold mb-4">Login</h2>
 
-        {error && <p className="text-red-500 mb-4 text-sm">{error}</p>}
+      {error && <p className="text-red-600 mb-3">{error}</p>}
 
-        <div className="mb-4">
-          <label className="block text-gray-600 mb-1">Email</label>
+      <form onSubmit={handleSubmit}>
+        <label className="block mb-2">
+          Email
           <input
             type="email"
-            className="w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
+            className="w-full border px-3 py-2 rounded"
           />
-        </div>
+        </label>
 
-        <div className="mb-6">
-          <label className="block text-gray-600 mb-1">Password</label>
+        <label className="block mb-4">
+          Password
           <input
             type="password"
-            className="w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
+            className="w-full border px-3 py-2 rounded"
           />
-        </div>
-
-        <div className="flex items-center mb-6">
-          <input
-            type="checkbox"
-            id="remember"
-            checked={rememberMe}
-            onChange={() => setRememberMe(!rememberMe)}
-            className="mr-2"
-          />
-          <label htmlFor="remember" className="text-sm text-gray-600">
-            Remember Me
-          </label>
-        </div>
+        </label>
 
         <button
           type="submit"
-          className="w-full bg-blue-600 text-white py-2 rounded-xl hover:bg-blue-700 transition duration-200"
+          className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
         >
-          Log In
+          Login
         </button>
-
-        <div className="mt-4 text-center">
-          <a href="/forgot-password" className="text-blue-500 text-sm">
-            Forgot Password?
-          </a>
-        </div>
       </form>
     </div>
   );
-}
+};
+
+export default LoginForm;

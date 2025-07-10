@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import AxiosInstance from "../Components/Axios"; // Your configured axios instance
 
-const  SignupForm = () => {
+const RegisterPage = () => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -154,4 +154,4 @@ const  SignupForm = () => {
   );
 };
 
-export default SignupForm;
+export default RegisterPage;

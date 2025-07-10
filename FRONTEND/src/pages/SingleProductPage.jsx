@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
-import { Star, Minus, Plus, Heart, ShoppingCart } from "lucide-react";
+import { useParams, useNavigate } from "react-router-dom";
+import { Star, Minus, Plus, ShoppingCart } from "lucide-react";
 import AxiosInstance from "../Components/Axios";
 
 const Button = ({ children, ...props }) => (
@@ -22,6 +22,8 @@ const Badge = ({ children, className = "" }) => (
 
 const SingleProductPage = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
+
   const [product, setProduct] = useState(null);
   const [quantity, setQuantity] = useState(1);
 
@@ -91,9 +93,17 @@ const SingleProductPage = () => {
     return stars;
   };
 
-  const handleAddToCart = () => {
-    // Implement add to cart logic here, e.g.:
-    alert(`Added ${quantity} of ${name} to cart.`);
+  const handleAddToCart = async () => {
+    try {
+      await AxiosInstance.post("carts/", {
+        product: product.id,
+        quantity: quantity,
+      });
+      navigate("/cart");
+    } catch (error) {
+      console.error("Error adding to cart:", error.response?.data || error.message);
+      alert("Failed to add to cart");
+    }
   };
 
   return (

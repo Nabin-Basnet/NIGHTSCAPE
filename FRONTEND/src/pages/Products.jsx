@@ -1,6 +1,4 @@
-"use client";
-
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Search,
@@ -8,15 +6,17 @@ import {
   Grid,
   List,
   Star,
-  Heart,
+  Heart as HeartIcon,
   ShoppingCart,
 } from "lucide-react";
 import AxiosInstance from "../Components/Axios";
+import { addToCart } from "../Utils/CartUtils";
 
 const Products = () => {
   const navigate = useNavigate();
 
   const [products, setProducts] = useState([]);
+  const [wishlist, setWishlist] = useState([]); // Wishlist product IDs
   const [viewMode, setViewMode] = useState("grid");
   const [sortBy, setSortBy] = useState("featured");
   const [searchQuery, setSearchQuery] = useState("");
@@ -25,7 +25,6 @@ const Products = () => {
   const [selectedBrands, setSelectedBrands] = useState([]);
   const [showFilters, setShowFilters] = useState(false);
 
-  // Fetch products once on mount
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -35,10 +34,21 @@ const Products = () => {
         console.error("Error fetching products", error);
       }
     };
+
+    const fetchWishlist = async () => {
+      try {
+        const response = await AxiosInstance.get("/wishlist/");
+        const wishlistedIds = response.data.map((item) => item.product.id);
+        setWishlist(wishlistedIds);
+      } catch (error) {
+        console.error("Error fetching wishlist", error);
+      }
+    };
+
     fetchProducts();
+    fetchWishlist();
   }, []);
 
-  // Toggle brand selection
   const toggleBrand = (brandId) => {
     setSelectedBrands((prev) =>
       prev.includes(brandId)
@@ -47,7 +57,6 @@ const Products = () => {
     );
   };
 
-  // Filter products based on search, category, price and brand
   const filteredProducts = products.filter((product) => {
     const matchesSearch = product.name
       .toLowerCase()
@@ -63,7 +72,6 @@ const Products = () => {
     return matchesSearch && matchesCategory && matchesPrice && matchesBrand;
   });
 
-  // Clear all filters
   const clearAllFilters = () => {
     setSearchQuery("");
     setSelectedCategory("all");
@@ -71,111 +79,135 @@ const Products = () => {
     setSelectedBrands([]);
   };
 
-  // Star rating display component
   const StarRating = ({ rating }) => (
     <div className="flex items-center">
       {[...Array(5)].map((_, i) => (
         <Star
           key={i}
           className={`w-4 h-4 ${
-            i < Math.floor(rating) ? "text-yellow-400 fill-current" : "text-gray-600"
+            i < Math.floor(rating)
+              ? "text-yellow-400 fill-current"
+              : "text-gray-600"
           }`}
         />
       ))}
     </div>
   );
 
-  // Add product to cart
-  const handleAddToCart = async (productId) => {
-    try {
-      await AxiosInstance.post("carts/", {
-        product_id: productId,
-        quantity: 1,
-      });
-      navigate("/cart");
-    } catch (error) {
-      console.error("Error adding to cart:", error);
-      alert("Failed to add to cart");
+  const handleAddToCart = (productId) => {
+    addToCart(productId, navigate);
+  };
+
+  // ✅ UPDATED: Show alert on wishlist addition
+  const toggleWishlist = async (productId) => {
+    if (wishlist.includes(productId)) {
+      try {
+        await AxiosInstance.delete(`/wishlist/${productId}/`);
+        setWishlist(wishlist.filter((id) => id !== productId));
+      } catch (error) {
+        console.error("Failed to remove from wishlist", error);
+      }
+    } else {
+      try {
+        await AxiosInstance.post("/wishlist/", { product_id: productId });
+        setWishlist([...wishlist, productId]);
+        alert("✅ Product added to your wishlist!");
+      } catch (error) {
+        console.error("Failed to add to wishlist", error);
+        if (error.response) {
+          console.error("Backend error:", error.response.data);
+        }
+      }
     }
   };
 
-  // Product card component
-  const ProductCard = ({ product }) => (
-    <div
-      className={`bg-gray-800 rounded-lg overflow-hidden hover:bg-gray-750 transition-colors group ${
-        viewMode === "list" ? "flex gap-4" : ""
-      }`}
-      onClick={() => navigate(`/products/${product.id}`)} // Navigate to product detail on click
-      style={{ cursor: "pointer" }}
-    >
-      <div className={`relative ${viewMode === "list" ? "w-48 flex-shrink-0" : ""}`}>
-        <img
-          src={product.image}
-          alt={product.name}
-          className={`w-full object-cover bg-gray-700 ${
-            viewMode === "list" ? "h-32" : "h-48"
-          }`}
-        />
-        {product.is_new && (
-          <span className="absolute top-2 left-2 bg-green-600 text-white px-2 py-1 rounded text-xs font-semibold">
-            NEW
-          </span>
-        )}
-        {product.on_sale && (
-          <span className="absolute top-2 right-2 bg-red-600 text-white px-2 py-1 rounded text-xs font-semibold">
-            SALE
-          </span>
-        )}
-        <div className="absolute inset-0 bg-black/30 bg-opacity-0 group-hover:bg-opacity-20 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100">
-          <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
-            <button className="p-2 bg-white text-gray-900 rounded-full hover:bg-gray-100">
-              <Heart className="w-4 h-4" />
-            </button>
-            <button
-              onClick={() => handleAddToCart(product.id)}
-              className="p-2 bg-blue-600 text-white rounded-full hover:bg-blue-700"
-            >
-              <ShoppingCart className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-      </div>
+  const ProductCard = ({ product }) => {
+    const isWishlisted = wishlist.includes(product.id);
 
-      <div className={`p-4 ${viewMode === "list" ? "flex-1" : ""}`}>
-        <h3 className="font-semibold mb-2 group-hover:text-blue-400 transition-colors">
-          {product.name}
-        </h3>
-
-        <div className="flex items-center mb-2">
-          <StarRating rating={product.rating} />
-          <span className="ml-2 text-sm text-gray-400">
-            ({product.reviews_count || 0})
-          </span>
-        </div>
-
-        <div className="flex items-center gap-2 mb-3">
-          <span className="text-lg font-bold text-green-400">${product.price}</span>
-          {product.original_price && (
-            <span className="text-sm text-gray-500 line-through">
-              ${product.original_price}
+    return (
+      <div
+        className={`bg-gray-800 rounded-lg overflow-hidden hover:bg-gray-750 transition-colors group ${
+          viewMode === "list" ? "flex gap-4" : ""
+        }`}
+        onClick={() => navigate(`/products/${product.id}`)}
+        style={{ cursor: "pointer" }}
+      >
+        <div className={`relative ${viewMode === "list" ? "w-48 flex-shrink-0" : ""}`}>
+          <img
+            src={product.image}
+            alt={product.name}
+            className={`w-full object-cover bg-gray-700 ${
+              viewMode === "list" ? "h-32" : "h-48"
+            }`}
+          />
+          {product.is_new && (
+            <span className="absolute top-2 left-2 bg-green-600 text-white px-2 py-1 rounded text-xs font-semibold">
+              NEW
             </span>
           )}
+          {product.on_sale && (
+            <span className="absolute top-2 right-2 bg-red-600 text-white px-2 py-1 rounded text-xs font-semibold">
+              SALE
+            </span>
+          )}
+          <div className="absolute inset-0 bg-black/30 bg-opacity-0 group-hover:bg-opacity-20 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100">
+            <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
+              <button
+                className={`p-2 rounded-full ${
+                  isWishlisted ? "bg-red-500 text-white" : "bg-white text-gray-900"
+                } hover:bg-red-600`}
+                onClick={() => toggleWishlist(product.id)}
+                aria-label="Toggle Wishlist"
+              >
+                <HeartIcon className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => handleAddToCart(product.id)}
+                className="p-2 bg-blue-600 text-white rounded-full hover:bg-blue-700"
+                aria-label="Add to Cart"
+              >
+                <ShoppingCart className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
         </div>
 
-        {viewMode === "list" && (
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              handleAddToCart(product.id);
-            }}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg font-semibold transition-colors"
-          >
-            Add to Cart
-          </button>
-        )}
+        <div className={`p-4 ${viewMode === "list" ? "flex-1" : ""}`}>
+          <h3 className="font-semibold mb-2 group-hover:text-blue-400 transition-colors">
+            {product.name}
+          </h3>
+
+          <div className="flex items-center mb-2">
+            <StarRating rating={product.rating} />
+            <span className="ml-2 text-sm text-gray-400">
+              ({product.reviews_count || 0})
+            </span>
+          </div>
+
+          <div className="flex items-center gap-2 mb-3">
+            <span className="text-lg font-bold text-green-400">${product.price}</span>
+            {product.original_price && (
+              <span className="text-sm text-gray-500 line-through">
+                ${product.original_price}
+              </span>
+            )}
+          </div>
+
+          {viewMode === "list" && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleAddToCart(product.id);
+              }}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg font-semibold transition-colors"
+            >
+              Add to Cart
+            </button>
+          )}
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">
@@ -217,12 +249,13 @@ const Products = () => {
                   <button
                     onClick={() => setSelectedCategory("all")}
                     className={`w-full text-left px-3 py-2 rounded-lg ${
-                      selectedCategory === "all" ? "bg-blue-600" : "hover:bg-gray-700"
+                      selectedCategory === "all"
+                        ? "bg-blue-600"
+                        : "hover:bg-gray-700"
                     }`}
                   >
                     All Products
                   </button>
-                  {/* Add more categories here if needed */}
                 </div>
               </div>
 
@@ -245,17 +278,19 @@ const Products = () => {
                     placeholder="Max"
                     value={priceRange[1]}
                     onChange={(e) =>
-                      setPriceRange([priceRange[0], parseInt(e.target.value) || 10000])
+                      setPriceRange([
+                        priceRange[0],
+                        parseInt(e.target.value) || 10000,
+                      ])
                     }
                     className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg"
                   />
                 </div>
               </div>
 
-              {/* Brands (Placeholder for future brand filters) */}
+              {/* Brands */}
               <div className="mb-6">
                 <h3 className="text-lg font-semibold mb-3">Brands</h3>
-                {/* Implement brand filter UI here if needed */}
               </div>
 
               <button
@@ -267,9 +302,8 @@ const Products = () => {
             </div>
           </div>
 
-          {/* Main content */}
+          {/* Main Content */}
           <div className="flex-1">
-            {/* Toolbar */}
             <div className="flex justify-between items-center mb-6">
               <div className="flex items-center gap-4">
                 <button
@@ -318,7 +352,6 @@ const Products = () => {
               </div>
             </div>
 
-            {/* Products grid/list */}
             <div
               className={`grid gap-6 ${
                 viewMode === "grid"

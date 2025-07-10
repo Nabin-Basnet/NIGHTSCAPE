@@ -28,8 +28,10 @@ import {
   ACCOUNT_ROUTE,
   ADMIN_ROUTE,
   CART_ROUTE,
+  WISHLIST_ROUTE,
 } from "./constants/navMenu";
 import CartPage from "./pages/Cart";
+import Wishlist from "./pages/Wishlist";
 
 const router = createBrowserRouter([
   {
@@ -95,6 +97,10 @@ const router = createBrowserRouter([
   {
     path: CART_ROUTE,
     element: <CartPage />,
+  },
+  {
+    path:WISHLIST_ROUTE,
+    element:<Wishlist />
   },
   {
     path: ADMIN_ROUTE,

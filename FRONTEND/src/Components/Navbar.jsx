@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { FaPhone, FaLock, FaUser, FaSearch } from "react-icons/fa";
 import { BsCart4 } from "react-icons/bs";
 import { Link, useNavigate } from "react-router-dom";
+import { jwtDecode } from "jwt-decode"; // ✅ correct import
 
 import {
   HOME_ROUTE,
@@ -15,27 +16,42 @@ import {
   SIGNUP_ROUTE,
   LOGIN_ROUTE,
   ACCOUNT_ROUTE,
-  CART_ROUTE, // define this in constants if not already
+  CART_ROUTE,
+  ADMIN_ROUTE,
 } from "../constants/navMenu";
 
 export default function Navbar() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [role, setRole] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    setIsAuthenticated(!!token);
+    const token = localStorage.getItem("access_token");
+    if (token) {
+      try {
+        const decoded = jwtDecode(token); // ✅ correct usage
+        console.log("Decoded JWT:", decoded);
+        setIsAuthenticated(true);
+        setRole(decoded.role); // expected: 'admin' or 'customer'
+      } catch (error) {
+        console.error("Token decoding failed:", error);
+        setIsAuthenticated(false);
+        setRole(null);
+      }
+    }
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("refresh_token");
     setIsAuthenticated(false);
-    navigate("/"); // redirect to homepage
+    setRole(null);
+    navigate("/");
   };
 
   return (
     <div className="bg-[#121212] text-white">
-      {/* Header Part 1 */}
+      {/* Header Top */}
       <div className="flex justify-end items-center h-[50px] bg-[#1e1e1e] text-sm font-medium font-sans border-b border-gray-700">
         <div className="ml-[700px] text-gray-300 hover:text-[#ff5c00]">
           <a href="#"><FaPhone className="inline" /> 9708845245</a>
@@ -65,8 +81,11 @@ export default function Navbar() {
 
             <div className="h-[25px] border-r-2 border-gray-600 mx-2"></div>
 
+            {/* ✅ Correct role-based account link */}
             <div className="text-gray-300 hover:text-[#ff5c00]">
-              <Link to={ACCOUNT_ROUTE}><FaUser className="inline" /> My Account</Link>
+              <Link to={role === "admin" ? ADMIN_ROUTE : ACCOUNT_ROUTE}>
+                <FaUser className="inline" /> My Account
+              </Link>
             </div>
           </>
         )}
@@ -76,15 +95,16 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Header Part 2 */}
+      {/* Header Middle */}
       <div className="flex items-center h-[100px] bg-[#181818] border-b border-gray-700">
         <div className="ml-[150px] mt-2">
           <Link to={HOME_ROUTE}>
-          <img
-            className="h-30 w-auto object-contain"
-            src="/images/logo.png"
-            alt="logo"
-          /></Link>
+            <img
+              className="h-30 w-auto object-contain"
+              src="/images/logo.png"
+              alt="logo"
+            />
+          </Link>
         </div>
 
         <input
@@ -102,10 +122,10 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Navbar Menu */}
+      {/* Main Navbar */}
       <div className="h-[60px] w-full border-b border-gray-600">
         <div className="flex justify-center items-center h-full space-x-4 text-white text-sm">
-          {[
+          {[ 
             { text: "Home", link: HOME_ROUTE },
             { text: "Products", link: PRODUCTS_ROUTE },
             { text: "Custom Design", link: CUSTOM_DESIGN_ROUTE },
@@ -122,6 +142,23 @@ export default function Navbar() {
               {text}
             </Link>
           ))}
+
+          {isAuthenticated && role === "admin" && (
+            <Link to={ADMIN_ROUTE} className="px-4 py-2 hover:bg-[#ed1c24] rounded-sm">
+              Admin Panel
+            </Link>
+          )}
+
+          {isAuthenticated && role === "customer" && (
+            <>
+              <Link to={CART_ROUTE} className="px-4 py-2 hover:bg-[#ed1c24] rounded-sm">
+                My Cart
+              </Link>
+              <Link to="/wishlist" className="px-4 py-2 hover:bg-[#ed1c24] rounded-sm">
+                Wishlist
+              </Link>
+            </>
+          )}
         </div>
       </div>
     </div>

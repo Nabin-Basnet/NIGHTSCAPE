@@ -1,14 +1,20 @@
-import axios from 'axios'
-
-const baseUrl = 'http://127.0.0.1:8000/api/'
+// src/Components/Axios.js
+import axios from 'axios';
 
 const AxiosInstance = axios.create({
-    baseURL: baseUrl,
-    timeout: 50000, // 5 seconds is usually enough
-    headers: {
-        "Content-Type": "application/json",
-        "accept": "application/json"
-    }
-})
+  baseURL: 'http://127.0.0.1:8000/api/',
+});
 
-export default AxiosInstance
+// ✅ Attach access token on every request
+AxiosInstance.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("access_token");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+export default AxiosInstance;
