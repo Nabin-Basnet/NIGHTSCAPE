@@ -15,6 +15,9 @@ from .serializers import (
     WishlistSerializer, PaymentSerializer, ReviewSerializer,
     ReturnSerializer, FeaturedProductSerializer
 )
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAdminUser
+from rest_framework.response import Response
 
 
 def landing(request):
@@ -66,6 +69,30 @@ class CartViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+
+
+# 🚀 Admin View: All users with carts
+@api_view(['GET'])
+@permission_classes([IsAdminUser])
+def admin_all_user_carts(request):
+    users = User.objects.filter(cart__isnull=False).distinct()
+    data = [
+        {
+            'id': user.id,
+            'name': user.name,
+            'email': user.email,
+        }
+        for user in users
+    ]
+    return Response(data)
+
+# 🚀 Admin View: Single user cart details
+@api_view(['GET'])
+@permission_classes([IsAdminUser])
+def admin_user_cart_detail(request, user_id):
+    carts = Cart.objects.filter(user_id=user_id)
+    serializer = CartSerializer(carts, many=True)
+    return Response(serializer.data)
 
 
 class WishlistViewSet(viewsets.ModelViewSet):

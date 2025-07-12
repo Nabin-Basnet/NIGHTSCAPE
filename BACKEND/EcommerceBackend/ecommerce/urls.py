@@ -1,37 +1,3 @@
-# from django.conf import settings
-# from django.conf.urls.static import static
-# from django.urls import include, path
-# from ecommerce.views import landing
-# from .views import (
-#     ProductViewSet, CategoryViewSet, CartViewSet, OrderViewSet,
-#     OrderItemViewSet, BrandViewSet, WishlistViewSet, UserViewSet,
-#     UserRegistrationView,MyTokenObtainPairView
-# )
-# from rest_framework.routers import DefaultRouter
-# from rest_framework_simplejwt.views import (
-#     TokenObtainPairView,
-#     TokenRefreshView,
-# )
-
-# router = DefaultRouter()
-# router.register(r'products', ProductViewSet)
-# router.register(r'categories', CategoryViewSet)
-# router.register(r'carts', CartViewSet, basename='cart')
-# router.register(r'orders', OrderViewSet, basename='order')
-# router.register(r'brands', BrandViewSet, basename='brand')
-# router.register(r'wishlist', WishlistViewSet, basename='wishlist')
-# router.register(r'users', UserViewSet, basename='user')
-
-# urlpatterns = [
-#     path("", landing),
-#     path('api/', include(router.urls)),
-#     path('api/register/', UserRegistrationView.as_view(), name='register'),
-#     # Use custom login view for email authentication:
-#     path('api/token/', MyTokenObtainPairView.as_view(), name='token_obtain_pair'),
-#     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-# ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-
-
 from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import include, path
@@ -40,7 +6,10 @@ from ecommerce.views import landing
 from .views import (
     ProductViewSet, CategoryViewSet, CartViewSet, OrderViewSet,
     OrderItemViewSet, BrandViewSet, WishlistViewSet, UserViewSet,
-    UserRegistrationView, MyTokenObtainPairView
+    UserRegistrationView, MyTokenObtainPairView,
+
+    # ✅ ADD THESE TWO LINES
+    admin_all_user_carts, admin_user_cart_detail
 )
 
 from rest_framework.routers import DefaultRouter
@@ -68,6 +37,9 @@ urlpatterns = [
     path('api/register/', UserRegistrationView.as_view(), name='register'),
     path('api/token/', MyTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('api/admin/carts/', admin_all_user_carts, name='admin-all-user-carts'),
+    path('api/admin/carts/<int:user_id>/', admin_user_cart_detail, name='admin-user-cart-detail'),
+
 ]
 
 # 📁 Media File Serving (only in development)
