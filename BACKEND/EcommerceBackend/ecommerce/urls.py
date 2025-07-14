@@ -9,7 +9,7 @@ from .views import (
     UserRegistrationView, MyTokenObtainPairView,
 
     # ✅ ADD THESE TWO LINES
-    admin_all_user_carts, admin_user_cart_detail
+    admin_all_user_carts, admin_user_cart_detail,admin_all_wishlist_items,admin_user_wishlist_detail
 )
 
 from rest_framework.routers import DefaultRouter
@@ -39,6 +39,9 @@ urlpatterns = [
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('api/admin/carts/', admin_all_user_carts, name='admin-all-user-carts'),
     path('api/admin/carts/<int:user_id>/', admin_user_cart_detail, name='admin-user-cart-detail'),
+    path('api/admin/wishlist/', admin_all_wishlist_items, name='admin-all-wishlist-items'),
+    path('api/admin/user-wishlist/<int:user_id>/', admin_user_wishlist_detail, name='admin-user-wishlist-detail'),
+
 
 ]
 

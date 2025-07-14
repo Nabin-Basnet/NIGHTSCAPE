@@ -1,7 +1,10 @@
 from django.http import HttpResponse
 from rest_framework import viewsets, generics
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
 from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.response import Response
+
 from .serializers import MyTokenObtainPairSerializer
 from .models import (
     User, Product, Category, Brand, ProductImage,
@@ -15,10 +18,6 @@ from .serializers import (
     WishlistSerializer, PaymentSerializer, ReviewSerializer,
     ReturnSerializer, FeaturedProductSerializer
 )
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAdminUser
-from rest_framework.response import Response
-
 
 def landing(request):
     return HttpResponse("hello buddy")
@@ -60,11 +59,8 @@ class CartViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        print(">>> AUTHENTICATED USER:", user)
         if user.is_authenticated:
-            carts = Cart.objects.filter(user=user)
-            print(">>> USER CARTS:", carts)
-            return carts
+            return Cart.objects.filter(user=user)
         return Cart.objects.none()
 
     def perform_create(self, serializer):
@@ -75,6 +71,9 @@ class CartViewSet(viewsets.ModelViewSet):
 @api_view(['GET'])
 @permission_classes([IsAdminUser])
 def admin_all_user_carts(request):
+    print("User:", request.user)
+    print("Is Authenticated:", request.user.is_authenticated)
+    print("Is Staff:", request.user.is_staff)
     users = User.objects.filter(cart__isnull=False).distinct()
     data = [
         {
@@ -85,6 +84,7 @@ def admin_all_user_carts(request):
         for user in users
     ]
     return Response(data)
+
 
 # 🚀 Admin View: Single user cart details
 @api_view(['GET'])
@@ -104,6 +104,40 @@ class WishlistViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+
+
+# 🚀 Admin View: All users with wishlists
+@api_view(['GET'])
+@permission_classes([IsAdminUser])
+def admin_all_user_wishlists(request):
+    users = User.objects.filter(wishlist__isnull=False).distinct()
+    data = [
+        {
+            'id': user.id,
+            'name': user.name,
+            'email': user.email,
+        }
+        for user in users
+    ]
+    return Response(data)
+
+
+# 🚀 Admin View: Single user wishlist details
+@api_view(['GET'])
+@permission_classes([IsAdminUser])
+def admin_user_wishlist_detail(request, user_id):
+    wishlists = Wishlist.objects.filter(user_id=user_id)
+    serializer = WishlistSerializer(wishlists, many=True)
+    return Response(serializer.data)
+
+
+# ✅ Admin View: All wishlist items for admin
+@api_view(['GET'])
+@permission_classes([IsAdminUser])
+def admin_all_wishlist_items(request):
+    wishlists = Wishlist.objects.select_related('user', 'product').all()
+    serializer = WishlistSerializer(wishlists, many=True)
+    return Response(serializer.data)
 
 
 class OrderViewSet(viewsets.ModelViewSet):

@@ -2,7 +2,6 @@ from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 
-# 1. Usersfrom django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 
 class UserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
@@ -17,7 +16,15 @@ class UserManager(BaseUserManager):
     def create_superuser(self, email, password=None, **extra_fields):
         extra_fields.setdefault("is_staff", True)
         extra_fields.setdefault("is_superuser", True)
+        extra_fields.setdefault("role", "admin")
+
+        if extra_fields.get("is_staff") is not True:
+            raise ValueError("Superuser must have is_staff=True.")
+        if extra_fields.get("is_superuser") is not True:
+            raise ValueError("Superuser must have is_superuser=True.")
+
         return self.create_user(email, password, **extra_fields)
+
 
 class User(AbstractBaseUser, PermissionsMixin):
     ROLE_CHOICES = [('customer', 'Customer'), ('admin', 'Admin')]
@@ -27,7 +34,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     phone = models.CharField(max_length=20, blank=True, null=True)
     role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='customer')
     is_active = models.BooleanField(default=True)
-    is_staff = models.BooleanField(default=False)
+    is_staff = models.BooleanField(default=False)      # Added for admin/staff flag
+    is_superuser = models.BooleanField(default=False)  # Added for superuser flag
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -40,7 +48,8 @@ class User(AbstractBaseUser, PermissionsMixin):
         return self.email
 
 
-# 2. Categories
+# Your other models...
+
 class Category(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
@@ -50,7 +59,7 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 
-# 3. Brands
+
 class Brand(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
@@ -59,7 +68,7 @@ class Brand(models.Model):
     def __str__(self):
         return self.name
 
-# 4. Products
+
 class Product(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
@@ -69,14 +78,14 @@ class Product(models.Model):
     brand = models.ForeignKey(Brand, on_delete=models.SET_NULL, null=True)
     discount = models.FloatField(blank=True, null=True)
     rating = models.FloatField(default=0.0)
-    image = models.ImageField(upload_to='products/', blank=True, null=True)  # main image (optional)
+    image = models.ImageField(upload_to='products/', blank=True, null=True)
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.name
 
-# 5. Product Images (for multiple images per product)
+
 class ProductImage(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images')
     image = models.ImageField(upload_to='product_images/')
@@ -85,7 +94,7 @@ class ProductImage(models.Model):
     def __str__(self):
         return f"Image for {self.product.name}"
 
-# 6. Addresses
+
 class Address(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     street = models.TextField()
@@ -97,7 +106,7 @@ class Address(models.Model):
     def __str__(self):
         return f"{self.user.name} - {self.city}, {self.country}"
 
-# 7. Orders
+
 class Order(models.Model):
     STATUS_CHOICES = [
         ('pending', 'Pending'),
@@ -117,17 +126,17 @@ class Order(models.Model):
     def __str__(self):
         return f"Order #{self.id} by {self.user.name}"
 
-# 8. Order Items
+
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
     product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
     quantity = models.IntegerField()
-    price = models.FloatField()  # captured at purchase time
+    price = models.FloatField()
 
     def __str__(self):
         return f"{self.quantity} x {self.product.name}"
 
-# 9. Cart
+
 class Cart(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
@@ -137,7 +146,7 @@ class Cart(models.Model):
     def __str__(self):
         return f"{self.user.name}'s Cart"
 
-# 10. Wishlist
+
 class Wishlist(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
@@ -146,7 +155,7 @@ class Wishlist(models.Model):
     def __str__(self):
         return f"{self.user.name}'s Wishlist"
 
-# 11. Payments
+
 class Payment(models.Model):
     METHOD_CHOICES = [
         ('card', 'Card'),
@@ -165,7 +174,7 @@ class Payment(models.Model):
     def __str__(self):
         return f"Payment #{self.id} by {self.user.name}"
 
-# 12. Reviews
+
 class Review(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
@@ -176,7 +185,7 @@ class Review(models.Model):
     def __str__(self):
         return f"{self.rating} stars by {self.user.name}"
 
-# 13. Returns
+
 class Return(models.Model):
     STATUS_CHOICES = [
         ('pending', 'Pending'),
@@ -195,7 +204,7 @@ class Return(models.Model):
     def __str__(self):
         return f"Return #{self.id} - {self.status}"
 
-# 14. Featured Products / Promotions
+
 class FeaturedProduct(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     highlight_type = models.CharField(max_length=100)

@@ -28,6 +28,8 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 
+AUTH_USER_MODEL = 'ecommerce.User'
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -67,7 +69,7 @@ AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
 ]
 
-AUTH_USER_MODEL = 'ecommerce.User'
+
 
 # Allow all origins (for development only!)
 CORS_ALLOW_ALL_ORIGINS = True

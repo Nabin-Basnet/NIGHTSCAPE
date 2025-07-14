@@ -3,21 +3,18 @@ from django.contrib.auth.hashers import make_password
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.contrib.auth import authenticate
 from .models import (
-    User, Category, Brand, Product, Address, Order, OrderItem,
+    User, Category, Brand, Product, ProductImage, Address, Order, OrderItem,
     Cart, Wishlist, Payment, Review, Return, FeaturedProduct
 )
 
-
+# JWT Token Serializer with extra claims
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):
         token = super().get_token(user)
-
-        # ✅ Add custom claims to the token
         token['name'] = user.name
         token['email'] = user.email
-        token['role'] = user.role  # 👈 required for frontend decoding
-
+        token['role'] = user.role
         return token
 
     def validate(self, attrs):
@@ -33,26 +30,42 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
             raise serializers.ValidationError('Invalid email or password')
 
         data = super().validate(attrs)
-        
-        # Optional: include user details in response body
         data['user'] = {
             'id': user.id,
             'name': user.name,
             'email': user.email,
             'role': user.role,
+            'is_staff': user.is_staff,
+            'is_superuser': user.is_superuser,
+        }
+        return data
+
+# User serializer (with is_staff and is_superuser)
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'name', 'email', 'phone', 'role', 'is_staff', 'is_superuser']
+        extra_kwargs = {
+            'is_staff': {'required': False},
+            'is_superuser': {'required': False},
         }
 
-        return data
-# --- User Registration Serializer ---
+    def update(self, instance, validated_data):
+        request = self.context.get('request')
+        if request and not request.user.is_superuser:
+            # Prevent non-superusers from changing is_staff and is_superuser
+            validated_data.pop('is_staff', None)
+            validated_data.pop('is_superuser', None)
+        return super().update(instance, validated_data)
+
+# User registration serializer
 class UserRegistrationSerializer(serializers.ModelSerializer):
     password2 = serializers.CharField(write_only=True)
 
     class Meta:
         model = User
         fields = ['name', 'email', 'password', 'password2', 'phone', 'role']
-        extra_kwargs = {
-            'password': {'write_only': True},
-        }
+        extra_kwargs = {'password': {'write_only': True}}
 
     def validate(self, attrs):
         if attrs.get('password') != attrs.get('password2'):
@@ -64,7 +77,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         validated_data['password'] = make_password(validated_data['password'])
         return User.objects.create(**validated_data)
 
-# --- Category Serializer ---
+
 class CategorySerializer(serializers.ModelSerializer):
     subcategories = serializers.SerializerMethodField()
 
@@ -75,28 +88,29 @@ class CategorySerializer(serializers.ModelSerializer):
     def get_subcategories(self, obj):
         return CategorySerializer(obj.subcategories.all(), many=True).data
 
-# --- Brand Serializer ---
+
 class BrandSerializer(serializers.ModelSerializer):
     class Meta:
         model = Brand
         fields = '__all__'
 
-# --- Product Serializer ---
+
+class ProductImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductImage
+        fields = ['id', 'image', 'alt_text']
+
+
 class ProductSerializer(serializers.ModelSerializer):
     category = CategorySerializer(read_only=True)
     brand = BrandSerializer(read_only=True)
+    images = ProductImageSerializer(many=True, read_only=True)
 
     class Meta:
         model = Product
         fields = '__all__'
 
-# --- User Serializer (needed for nested display) ---
-class UserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ['id', 'name', 'email', 'phone', 'role']
 
-# --- Address Serializer ---
 class AddressSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
 
@@ -104,7 +118,7 @@ class AddressSerializer(serializers.ModelSerializer):
         model = Address
         fields = '__all__'
 
-# --- OrderItem Serializer ---
+
 class OrderItemSerializer(serializers.ModelSerializer):
     product = ProductSerializer(read_only=True)
 
@@ -112,7 +126,7 @@ class OrderItemSerializer(serializers.ModelSerializer):
         model = OrderItem
         fields = ['id', 'product', 'quantity', 'price']
 
-# --- Order Serializer ---
+
 class OrderSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
     address = AddressSerializer(read_only=True)
@@ -122,27 +136,22 @@ class OrderSerializer(serializers.ModelSerializer):
         model = Order
         fields = '__all__'
 
-# --- Cart Serializer ---
+
 class CartSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
     product = ProductSerializer(read_only=True)
-
-    # Accept product_id on write only
     product_id = serializers.IntegerField(write_only=True)
-
-    # User is set automatically from the request user
-    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
+    user_field = serializers.HiddenField(default=serializers.CurrentUserDefault())
 
     class Meta:
         model = Cart
         fields = ['id', 'user', 'product', 'product_id', 'quantity', 'created_at']
 
     def create(self, validated_data):
-        user = validated_data.pop('user')  # From CurrentUserDefault
+        user = validated_data.pop('user_field')
         product_id = validated_data.pop('product_id')
         quantity = validated_data.get('quantity', 1)
 
-        # Validate product existence
         try:
             product = Product.objects.get(id=product_id)
         except Product.DoesNotExist:
@@ -159,12 +168,10 @@ class CartSerializer(serializers.ModelSerializer):
 
         return cart_item
 
-# --- Wishlist Serializer ---
+
 class WishlistSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
     product = ProductSerializer(read_only=True)
-    
-    # Accept product_id as write-only input
     product_id = serializers.IntegerField(write_only=True)
 
     class Meta:
@@ -175,19 +182,16 @@ class WishlistSerializer(serializers.ModelSerializer):
         user = self.context['request'].user
         product_id = validated_data.pop('product_id')
 
-        # Validate product exists
         try:
             product = Product.objects.get(id=product_id)
         except Product.DoesNotExist:
             raise serializers.ValidationError({"product_id": "Product not found."})
 
-        # Prevent duplicate wishlist items if you want
         wishlist_item, created = Wishlist.objects.get_or_create(user=user, product=product)
 
         return wishlist_item
 
 
-# --- Payment Serializer ---
 class PaymentSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
     order = OrderSerializer(read_only=True)
@@ -196,7 +200,7 @@ class PaymentSerializer(serializers.ModelSerializer):
         model = Payment
         fields = '__all__'
 
-# --- Review Serializer ---
+
 class ReviewSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
     product = ProductSerializer(read_only=True)
@@ -205,7 +209,7 @@ class ReviewSerializer(serializers.ModelSerializer):
         model = Review
         fields = '__all__'
 
-# --- Return Serializer ---
+
 class ReturnSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
     order = OrderSerializer(read_only=True)
@@ -215,7 +219,7 @@ class ReturnSerializer(serializers.ModelSerializer):
         model = Return
         fields = '__all__'
 
-# --- Featured Product Serializer ---
+
 class FeaturedProductSerializer(serializers.ModelSerializer):
     product = ProductSerializer(read_only=True)
 

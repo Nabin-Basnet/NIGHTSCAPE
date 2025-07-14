@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import AxiosInstance from "../../Components/Axios";
 
 export default function AdminBrand() {
@@ -6,9 +7,11 @@ export default function AdminBrand() {
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const navigate = useNavigate();
+
   const fetchBrands = (searchTerm) => {
     setLoading(true);
-    AxiosInstance.get("brand/", { params: { search: searchTerm } })
+    AxiosInstance.get("brands/", { params: { search: searchTerm } })
       .then((res) => {
         setBrands(res.data);
         setLoading(false);
@@ -24,13 +27,13 @@ export default function AdminBrand() {
   }, [search]);
 
   const handleEdit = (brand) => {
-    alert(`Edit brand ID ${brand.id} - implement your edit logic here`);
+    navigate(`/admin/update-brand/${brand.id}`); // ✅ Absolute path
   };
 
   const handleDelete = async (brandId) => {
     if (window.confirm("Are you sure you want to delete this brand?")) {
       try {
-        await AxiosInstance.delete(`brand/${brandId}/`);
+        await AxiosInstance.delete(`brands/${brandId}/`);
         fetchBrands(search);
       } catch (error) {
         console.error("Error deleting brand:", error);
@@ -41,7 +44,15 @@ export default function AdminBrand() {
 
   return (
     <div className="p-6">
-      <h1 className="text-3xl font-bold mb-6">Admin Brands</h1>
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold">Admin Brands</h1>
+        <button
+          onClick={() => navigate("/admin/Add-Brand")}
+          className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+        >
+          + Add New Brand
+        </button>
+      </div>
 
       <input
         type="text"

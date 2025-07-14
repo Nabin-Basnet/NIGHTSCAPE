@@ -26,9 +26,10 @@ export default function AdminProductList() {
     fetchProducts(search);
   }, [search]);
 
-  const handleEdit = (product) => {
-    alert(`Edit product ID ${product.id} - implement your edit logic here`);
-  };
+ const handleEdit = (product) => {
+  navigate(`/admin/update-product/${product.id}`);
+};
+
 
   const handleDelete = async (productId) => {
     if (window.confirm("Are you sure you want to delete this product?")) {

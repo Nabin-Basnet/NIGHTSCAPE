@@ -29,9 +29,11 @@ import {
   ADMIN_ROUTE,
   CART_ROUTE,
   WISHLIST_ROUTE,
+  PAYMENT_ROUTE,
 } from "./constants/navMenu";
 import CartPage from "./pages/Cart";
 import Wishlist from "./pages/Wishlist";
+import PaymentPage from "./pages/PaymentPage";
 
 const router = createBrowserRouter([
   {
@@ -101,6 +103,10 @@ const router = createBrowserRouter([
   {
     path:WISHLIST_ROUTE,
     element:<Wishlist />
+  },
+  {
+    path:PAYMENT_ROUTE,
+    element:<PaymentPage />
   },
   {
     path: ADMIN_ROUTE,

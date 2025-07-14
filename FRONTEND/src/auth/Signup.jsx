@@ -1,12 +1,14 @@
 import React, { useState } from "react";
-import AxiosInstance from "../Components/Axios"; // Your configured axios instance
+import AxiosInstance from "../Components/Axios";
 
-const  SignupForm = () => {
+const SignupForm = () => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     phone: "",
-    role: "customer", // default role
+    role: "customer",
+    is_staff: false,
+    is_superuser: false,
     password: "",
     password2: "",
   });
@@ -15,9 +17,10 @@ const  SignupForm = () => {
   const [success, setSuccess] = useState("");
 
   const handleChange = (e) => {
-    setFormData(prev => ({
+    const { name, type, checked, value } = e.target;
+    setFormData((prev) => ({
       ...prev,
-      [e.target.name]: e.target.value,
+      [name]: type === "checkbox" ? checked : value,
     }));
   };
 
@@ -32,11 +35,13 @@ const  SignupForm = () => {
     }
 
     try {
-      const response = await AxiosInstance.post("/register/", {
+      await AxiosInstance.post("/register/", {
         name: formData.name,
         email: formData.email,
         phone: formData.phone,
         role: formData.role,
+        is_staff: formData.is_staff,
+        is_superuser: formData.is_superuser,
         password: formData.password,
         password2: formData.password2,
       });
@@ -47,13 +52,14 @@ const  SignupForm = () => {
         email: "",
         phone: "",
         role: "customer",
+        is_staff: false,
+        is_superuser: false,
         password: "",
         password2: "",
       });
     } catch (err) {
       console.error(err);
       if (err.response && err.response.data) {
-        // Show first error message returned by API
         const firstKey = Object.keys(err.response.data)[0];
         setError(err.response.data[firstKey][0]);
       } else {
@@ -70,6 +76,8 @@ const  SignupForm = () => {
       {success && <p className="text-green-600 mb-3">{success}</p>}
 
       <form onSubmit={handleSubmit}>
+        {/* Name, Email, Phone, Role unchanged */}
+
         <label className="block mb-2">
           Name
           <input
@@ -105,7 +113,6 @@ const  SignupForm = () => {
           />
         </label>
 
-        {/* Optional: Role select */}
         <label className="block mb-2">
           Role
           <select
@@ -117,6 +124,29 @@ const  SignupForm = () => {
             <option value="customer">Customer</option>
             <option value="admin">Admin</option>
           </select>
+        </label>
+
+        {/* New checkboxes for is_staff and is_superuser */}
+        <label className="inline-flex items-center mb-2">
+          <input
+            type="checkbox"
+            name="is_staff"
+            checked={formData.is_staff}
+            onChange={handleChange}
+            className="mr-2"
+          />
+          Is Staff
+        </label>
+
+        <label className="inline-flex items-center mb-4 ml-4">
+          <input
+            type="checkbox"
+            name="is_superuser"
+            checked={formData.is_superuser}
+            onChange={handleChange}
+            className="mr-2"
+          />
+          Is Superuser
         </label>
 
         <label className="block mb-2">

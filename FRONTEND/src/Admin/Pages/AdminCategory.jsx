@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import AxiosInstance from "../../Components/Axios";
 
 export default function AdminCategoryList() {
   const [categories, setCategories] = useState([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const fetchCategories = (searchTerm) => {
     setLoading(true);
@@ -24,7 +26,7 @@ export default function AdminCategoryList() {
   }, [search]);
 
   const handleEdit = (category) => {
-    alert(`Edit category ID ${category.id} - implement your edit logic here`);
+    navigate(`/admin/update-category/${category.id}`);
   };
 
   const handleDelete = async (categoryId) => {
@@ -41,8 +43,18 @@ export default function AdminCategoryList() {
 
   return (
     <div className="p-6">
-      <h1 className="text-3xl font-bold mb-6">Admin Categories</h1>
+      {/* Header and Add Button */}
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-3xl font-bold">📂 Admin Categories</h1>
+        <button
+          onClick={() => navigate("/admin/add-category")}
+          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded shadow"
+        >
+          + Add Category
+        </button>
+      </div>
 
+      {/* Search Input */}
       <input
         type="text"
         placeholder="Search categories..."
@@ -51,12 +63,13 @@ export default function AdminCategoryList() {
         onChange={(e) => setSearch(e.target.value)}
       />
 
+      {/* Categories Table */}
       {loading ? (
         <p>Loading...</p>
       ) : categories.length > 0 ? (
-        <table className="w-full border-collapse border border-gray-300">
+        <table className="w-full border-collapse border border-gray-300 text-sm">
           <thead>
-            <tr>
+            <tr className="bg-gray-100">
               <th className="border border-gray-300 p-2">ID</th>
               <th className="border border-gray-300 p-2">Image</th>
               <th className="border border-gray-300 p-2">Name</th>

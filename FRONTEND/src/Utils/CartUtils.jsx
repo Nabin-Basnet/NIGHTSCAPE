@@ -1,9 +1,10 @@
-import { jwtDecode } from "jwt-decode";
-
+// src/Components/CartUtils.jsx
+import { jwtDecode } from "jwt-decode"; // ✅ Named import
 import AxiosInstance from "../Components/Axios";
 
-export const addToCart = async (productId, navigate) => {
+export const addToCart = async (productId, navigate, quantity = 1) => {
   const token = localStorage.getItem("access_token");
+
   if (!token) {
     alert("Please log in to add products to your cart.");
     navigate("/login");
@@ -11,7 +12,7 @@ export const addToCart = async (productId, navigate) => {
   }
 
   try {
-    const decoded = jwtDecode(token);
+    const decoded = jwtDecode(token); // ✅ Use named function
     if (decoded.role !== "customer") {
       alert("Only customers can add products to the cart.");
       return false;
@@ -25,13 +26,13 @@ export const addToCart = async (productId, navigate) => {
   try {
     await AxiosInstance.post("carts/", {
       product_id: productId,
-      quantity: 1,
+      quantity: quantity,
     });
     alert("Product added to cart!");
     navigate("/cart");
     return true;
   } catch (error) {
-    console.error("Error adding to cart:", error);
+    console.error("Error adding to cart:", error.response?.data || error.message);
     alert("Failed to add to cart");
     return false;
   }

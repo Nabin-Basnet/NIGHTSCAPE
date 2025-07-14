@@ -1,3 +1,4 @@
+// src/pages/SingleProductPage.jsx
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Star, Minus, Plus, ShoppingCart } from "lucide-react";
@@ -5,7 +6,7 @@ import AxiosInstance from "../Components/Axios";
 
 const Button = ({ children, ...props }) => (
   <button
-    className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
+    className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
     {...props}
   >
     {children}
@@ -74,10 +75,7 @@ const SingleProductPage = () => {
 
     for (let i = 0; i < fullStars; i++) {
       stars.push(
-        <Star
-          key={i}
-          className="w-4 h-4 fill-yellow-400 text-yellow-400"
-        />
+        <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
       );
     }
     if (hasHalfStar)
@@ -96,7 +94,7 @@ const SingleProductPage = () => {
   const handleAddToCart = async () => {
     try {
       await AxiosInstance.post("carts/", {
-        product: product.id,
+        product_id: product.id, // ✅ Fixed: use correct key
         quantity: quantity,
       });
       navigate("/cart");
@@ -123,6 +121,7 @@ const SingleProductPage = () => {
             {category && <Badge>{category.name}</Badge>}
             {brand && <span className="text-sm text-gray-500">by {brand.name}</span>}
           </div>
+
           <h1 className="text-3xl font-bold text-gray-900">{name}</h1>
 
           <div className="flex items-center gap-2">
@@ -141,7 +140,31 @@ const SingleProductPage = () => {
             </p>
           )}
 
-          <div className="flex items-center gap-4">
+          {/* Brand details with logo */}
+          {brand && (
+            <div className="mt-4 p-4 bg-gray-100 rounded shadow-sm">
+              <h2 className="text-xl font-semibold mb-2">Brand Details</h2>
+              <div className="flex items-center gap-4">
+                {brand.logo && (
+                  <img
+                    src={brand.logo}
+                    alt={brand.name}
+                    className="w-20 h-20 object-contain rounded"
+                  />
+                )}
+                <div>
+                  <p className="font-semibold text-gray-900">{brand.name}</p>
+                  <p className="text-gray-600">{brand.description}</p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <div className="mt-4">
+            <p><strong>Stock Quantity:</strong> {stock_quantity}</p>
+          </div>
+
+          <div className="flex items-center gap-4 mt-4">
             <span>Quantity:</span>
             <div className="flex items-center border rounded">
               <Button onClick={() => handleQuantityChange(-1)}><Minus /></Button>

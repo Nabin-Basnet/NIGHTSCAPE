@@ -4,10 +4,10 @@ import AxiosInstance from "./Axios";
 export const getCart = async () => {
   try {
     const res = await AxiosInstance.get("carts/");
-    return res.data;  // Return the array of cart items directly
+    return res.data;
   } catch (err) {
     console.error("Error fetching cart:", err);
-    return []; // Return empty array if error
+    return [];
   }
 };
 
@@ -19,9 +19,13 @@ export const removeCartItem = async (id) => {
   }
 };
 
-export const updateCartItem = async (id, quantity) => {
+// ✅ FIXED: include product_id in the PUT request
+export const updateCartItem = async (id, quantity, productId) => {
   try {
-    await AxiosInstance.put(`carts/${id}/`, { quantity });
+    await AxiosInstance.put(`carts/${id}/`, {
+      quantity,
+      product_id: productId, // ✅ Required by backend
+    });
   } catch (err) {
     console.error("Error updating cart item:", err);
   }
