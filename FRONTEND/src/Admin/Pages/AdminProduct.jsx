@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import AxiosInstance from "../../Components/Axios";   
+import AxiosInstance from "../../Components/Axios";
 import { ADMIN_PRODUCT, ADD_PRODUCT } from "../Constants/AdminMenu";
 
 export default function AdminProductList() {
@@ -26,10 +26,9 @@ export default function AdminProductList() {
     fetchProducts(search);
   }, [search]);
 
- const handleEdit = (product) => {
-  navigate(`/admin/update-product/${product.id}`);
-};
-
+  const handleEdit = (product) => {
+    navigate(`/admin/update-product/${product.id}`);
+  };
 
   const handleDelete = async (productId) => {
     if (window.confirm("Are you sure you want to delete this product?")) {
@@ -49,7 +48,7 @@ export default function AdminProductList() {
       <div className="flex items-center justify-between mb-4">
         <h1 className="text-3xl font-bold">Admin Products</h1>
         <button
-          onClick={() => navigate(`/admin/${ADD_PRODUCT}`)} 
+          onClick={() => navigate(`/admin/${ADD_PRODUCT}`)}
           className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
         >
           + Add Product
@@ -81,6 +80,7 @@ export default function AdminProductList() {
               <th className="border border-gray-300 p-2">Stock Qty</th>
               <th className="border border-gray-300 p-2">Discount</th>
               <th className="border border-gray-300 p-2">Description</th>
+              <th className="border border-gray-300 p-2">Featured</th>
               <th className="border border-gray-300 p-2">Created At</th>
               <th className="border border-gray-300 p-2">Updated At</th>
               <th className="border border-gray-300 p-2">Actions</th>
@@ -112,8 +112,15 @@ export default function AdminProductList() {
                 <td className="border border-gray-300 p-2">{p.stock_quantity}</td>
                 <td className="border border-gray-300 p-2">{p.discount ? `${p.discount}%` : "0%"}</td>
                 <td className="border border-gray-300 p-2">{p.description}</td>
-                <td className="border border-gray-300 p-2">{new Date(p.created_at).toLocaleString()}</td>
-                <td className="border border-gray-300 p-2">{new Date(p.updated_at).toLocaleString()}</td>
+                <td className="border border-gray-300 p-2 text-center text-lg">
+                  {p.featured ? "✅" : "❌"}
+                </td>
+                <td className="border border-gray-300 p-2">
+                  {new Date(p.created_at).toLocaleString()}
+                </td>
+                <td className="border border-gray-300 p-2">
+                  {new Date(p.updated_at).toLocaleString()}
+                </td>
                 <td className="border border-gray-300 p-2 space-x-2">
                   <button
                     onClick={() => handleEdit(p)}

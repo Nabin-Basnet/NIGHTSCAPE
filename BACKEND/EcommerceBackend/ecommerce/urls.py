@@ -2,14 +2,16 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import include, path
 
+from .views import clear_cart
+
 from ecommerce.views import landing
 from .views import (
     ProductViewSet, CategoryViewSet, CartViewSet, OrderViewSet,
     OrderItemViewSet, BrandViewSet, WishlistViewSet, UserViewSet,
-    UserRegistrationView, MyTokenObtainPairView,FeaturedProductViewSet,
+    UserRegistrationView, MyTokenObtainPairView,FeaturedProductViewSet,AddressViewSet,
 
     # ✅ ADD THESE TWO LINES
-    admin_all_user_carts, admin_user_cart_detail,admin_all_wishlist_items,admin_user_wishlist_detail
+    admin_all_user_carts, admin_user_cart_detail,admin_all_wishlist_items,admin_user_wishlist_detail,
 )
 
 from rest_framework.routers import DefaultRouter
@@ -26,6 +28,7 @@ router.register(r'wishlist', WishlistViewSet, basename='wishlist')  # Custom get
 router.register(r'users', UserViewSet, basename='user')
 router.register(r'featured', FeaturedProductViewSet, basename='featured-product')
 
+router.register(r'addresses', AddressViewSet, basename='address')  # Custom get_queryset
 # URL Patterns
 urlpatterns = [
     # 🏠 Landing Page
@@ -42,6 +45,7 @@ urlpatterns = [
     path('api/admin/carts/<int:user_id>/', admin_user_cart_detail, name='admin-user-cart-detail'),
     path('api/admin/wishlist/', admin_all_wishlist_items, name='admin-all-wishlist-items'),
     path('api/admin/user-wishlist/<int:user_id>/', admin_user_wishlist_detail, name='admin-user-wishlist-detail'),
+    path('api/carts-clear/', clear_cart, name='clear-cart'),
 
 
 ]

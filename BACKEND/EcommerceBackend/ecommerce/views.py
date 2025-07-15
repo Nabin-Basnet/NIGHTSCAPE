@@ -1,24 +1,24 @@
 from django.http import HttpResponse
-from rest_framework import viewsets, generics
+from rest_framework import viewsets, generics, status
 from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
-from rest_framework.permissions import AllowAny
 
-from .serializers import MyTokenObtainPairSerializer
-from .models import (
-    User, Product, Category, Brand, ProductImage,
-    Address, Order, OrderItem, Cart, Wishlist,
-    Payment, Review, Return, FeaturedProduct
-)
 from .serializers import (
+    MyTokenObtainPairSerializer,
     UserSerializer, UserRegistrationSerializer, CategorySerializer,
     BrandSerializer, ProductSerializer, AddressSerializer,
     OrderItemSerializer, OrderSerializer, CartSerializer,
     WishlistSerializer, PaymentSerializer, ReviewSerializer,
     ReturnSerializer, FeaturedProductSerializer
 )
+from .models import (
+    User, Product, Category, Brand, ProductImage,
+    Address, Order, OrderItem, Cart, Wishlist,
+    Payment, Review, Return, FeaturedProduct
+)
+
 
 def landing(request):
     return HttpResponse("hello buddy")
@@ -39,7 +39,6 @@ class UserViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
 
-# ✅ Updated to allow only admins to create/update/delete products
 class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all().order_by('id')
     serializer_class = ProductSerializer
@@ -70,11 +69,23 @@ class CartViewSet(viewsets.ModelViewSet):
             return Cart.objects.filter(user=user)
         return Cart.objects.none()
 
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context.update({"request": self.request})
+        return context
+
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
 
-# 🚀 Admin View: All users with carts
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def clear_cart(request):
+    user = request.user
+    Cart.objects.filter(user=user).delete()
+    return Response({'detail': 'Cart cleared.'}, status=status.HTTP_204_NO_CONTENT)
+
+
 @api_view(['GET'])
 @permission_classes([IsAdminUser])
 def admin_all_user_carts(request):
@@ -90,7 +101,6 @@ def admin_all_user_carts(request):
     return Response(data)
 
 
-# 🚀 Admin View: Single user cart details
 @api_view(['GET'])
 @permission_classes([IsAdminUser])
 def admin_user_cart_detail(request, user_id):
@@ -106,11 +116,15 @@ class WishlistViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         return Wishlist.objects.filter(user=self.request.user)
 
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context.update({"request": self.request})
+        return context
+
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
 
-# 🚀 Admin View: All users with wishlists
 @api_view(['GET'])
 @permission_classes([IsAdminUser])
 def admin_all_user_wishlists(request):
@@ -126,7 +140,6 @@ def admin_all_user_wishlists(request):
     return Response(data)
 
 
-# 🚀 Admin View: Single user wishlist details
 @api_view(['GET'])
 @permission_classes([IsAdminUser])
 def admin_user_wishlist_detail(request, user_id):
@@ -135,7 +148,6 @@ def admin_user_wishlist_detail(request, user_id):
     return Response(serializer.data)
 
 
-# ✅ Admin View: All wishlist items for admin
 @api_view(['GET'])
 @permission_classes([IsAdminUser])
 def admin_all_wishlist_items(request):
@@ -149,10 +161,44 @@ class OrderViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return Order.objects.filter(user=self.request.user)
+        user = self.request.user
+        if user.is_staff or user.is_superuser:
+            return Order.objects.all()
+        return Order.objects.filter(user=user)
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context.update({"request": self.request})
+        return context
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        user = self.request.user
+        items_data = self.request.data.get('items', [])
+
+        # Save order without items first
+        order = serializer.save(user=user)
+
+        # Create OrderItems related to the order
+        for item in items_data:
+            product_id = item.get('product')
+            quantity = item.get('quantity', 1)
+
+            try:
+                product = Product.objects.get(id=product_id)
+            except Product.DoesNotExist:
+                continue
+
+            OrderItem.objects.create(
+                order=order,
+                product=product,
+                quantity=quantity,
+                price=product.price
+            )
+
+        # Update total amount based on created order items
+        total = sum(oi.price * oi.quantity for oi in order.items.all())
+        order.total_amount = total
+        order.save()
 
 
 class OrderItemViewSet(viewsets.ModelViewSet):
@@ -185,10 +231,20 @@ class FeaturedProductViewSet(viewsets.ModelViewSet):
     permission_classes = [AllowAny]
 
 
-# ✅ Public API: List of all featured products with product info
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def featured_products_list(request):
     featured_products = FeaturedProduct.objects.select_related('product').all()
     serializer = FeaturedProductSerializer(featured_products, many=True)
     return Response(serializer.data)
+
+
+class AddressViewSet(viewsets.ModelViewSet):
+    serializer_class = AddressSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Address.objects.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)

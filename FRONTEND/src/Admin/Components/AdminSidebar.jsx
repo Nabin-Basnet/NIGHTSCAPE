@@ -116,14 +116,6 @@ export default function Sidebar() {
           </Link>
 
           <Link
-            to={`/admin/${ADMIN_ADDRESS}`}
-            className={`flex items-center gap-3 px-4 py-2 rounded hover:bg-[#313b55] ${isActive(ADMIN_ADDRESS)}`}
-          >
-            <FaMapMarkerAlt />
-            <span>Address</span>
-          </Link>
-
-          <Link
             to={`/admin/${ADMIN_FEATURED_PRODUCTS}`}
             className={`flex items-center gap-3 px-4 py-2 rounded hover:bg-[#313b55] ${isActive(ADMIN_FEATURED_PRODUCTS)}`}
           >

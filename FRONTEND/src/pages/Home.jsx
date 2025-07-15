@@ -1,22 +1,21 @@
-import React, { useState, useEffect } from 'react'
-import AxiosInstance from '../Components/Axios'
-// import AxiosInstance from '../Components/Axios'
+import React, { useState, useEffect } from 'react';
+import AxiosInstance from '../Components/Axios';
 
 export default function Home() {
-  const [products, setProducts] = useState([])
+  const [featuredProducts, setFeaturedProducts] = useState([]);
 
   const GetData = async () => {
     try {
-      const response = await AxiosInstance.get('products/')
-      setProducts(response.data)
+      const response = await AxiosInstance.get('featured/'); // Fetch featured product entries
+      setFeaturedProducts(response.data);
     } catch (error) {
-      console.error('Error fetching products:', error)
+      console.error('Error fetching featured products:', error);
     }
-  }
+  };
 
   useEffect(() => {
-    GetData()
-  }, [])
+    GetData();
+  }, []);
 
   return (
     <div className="font-sans text-gray-100 bg-gray-900 min-h-screen">
@@ -43,48 +42,50 @@ export default function Home() {
             </div>
           ))}
         </div>
-
       </section>
 
       {/* Featured Products */}
       <section className="bg-gray-900 py-16 px-4">
-        <h3 className="text-3xl font-bold text-center mb-12 text-white">Featured Products</h3>
+        <h3 className="text-3xl font-bold text-center mb-12 text-white">🌟 Featured Products</h3>
         <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10">
-          {products.length > 0 ? (
-            products.map((item) => (
-              <div
-                key={item.id}
-                className="bg-gray-800 p-6 rounded-2xl shadow-md hover:shadow-xl transition duration-300 border border-gray-700"
-              >
-                <div className="h-48 bg-gray-700 rounded-lg mb-4 flex items-center justify-center overflow-hidden">
-                  <img
-                    src={item.image}
-                    alt={item.name}
-                    className="object-cover h-full w-full"
-                    onError={(e) => {
-                      e.target.onerror = null;
-                      e.target.src = 'https://placehold.co/300x300?text=No+Image';
-                    }}
-                  />
-                </div>
+          {featuredProducts.length > 0 ? (
+            featuredProducts.map((item) => {
+              const product = item.product;
+              return (
+                <div
+                  key={item.id}
+                  className="bg-gray-800 p-6 rounded-2xl shadow-md hover:shadow-xl transition duration-300 border border-gray-700"
+                >
+                  <div className="h-48 bg-gray-700 rounded-lg mb-4 flex items-center justify-center overflow-hidden">
+                    <img
+                      src={product.image || 'https://placehold.co/300x300?text=No+Image'}
+                      alt={product.name}
+                      className="object-cover h-full w-full"
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = 'https://placehold.co/300x300?text=No+Image';
+                      }}
+                    />
+                  </div>
 
-                <h4 className="text-xl font-semibold text-white mb-1">{item.name}</h4>
-                <p className="text-gray-400 mb-3 text-sm">{item.description}</p>
-                <div className="flex justify-between items-center">
-                  <span className="text-blue-400 font-semibold text-lg">
-                    ${item.price.toFixed(2)}
-                  </span>
-                  <button className="bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium px-4 py-2 rounded-lg transition">
-                    Add to Cart
-                  </button>
+                  <h4 className="text-xl font-semibold text-white mb-1">{product.name}</h4>
+                  <p className="text-gray-400 mb-3 text-sm">{product.description}</p>
+                  <div className="flex justify-between items-center">
+                    <span className="text-blue-400 font-semibold text-lg">
+                      ${product.price.toFixed(2)}
+                    </span>
+                    <button className="bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium px-4 py-2 rounded-lg transition">
+                      Add to Cart
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))
+              );
+            })
           ) : (
-            <p className="text-gray-300 text-center col-span-full">No products found.</p>
+            <p className="text-gray-300 text-center col-span-full">No featured products found.</p>
           )}
         </div>
       </section>
     </div>
-  )
+  );
 }

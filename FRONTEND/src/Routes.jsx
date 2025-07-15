@@ -34,6 +34,7 @@ import {
 import CartPage from "./pages/Cart";
 import Wishlist from "./pages/Wishlist";
 import PaymentPage from "./pages/PaymentPage";
+import OrderSummary from "./pages/OrderSummery";
 
 const router = createBrowserRouter([
   {
@@ -99,6 +100,10 @@ const router = createBrowserRouter([
   {
     path: CART_ROUTE,
     element: <CartPage />,
+  },
+  {
+    path:"order-summary",
+    element: <OrderSummary />
   },
   {
     path:WISHLIST_ROUTE,

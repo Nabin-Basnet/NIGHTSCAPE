@@ -4,19 +4,23 @@ import axios from "../../../Components/Axios";
 export default function ProductAdd() {
   const [categories, setCategories] = useState([]);
   const [brands, setBrands] = useState([]);
+  const [loading, setLoading] = useState(false); // loading state
+
   const [formData, setFormData] = useState({
     name: "",
     description: "",
     price: "",
     stock_quantity: "",
-    discount: "",
-    category: "",
-    brand: "",
+    discount: "",    // keep empty string as default
+    category: "",    // for select
+    brand: "",       // for select
     image: null,
+    featured: false,
   });
 
   const [previewImage, setPreviewImage] = useState(null);
 
+  // Fetch categories and brands with Authorization header
   useEffect(() => {
     fetchCategories();
     fetchBrands();
@@ -24,7 +28,10 @@ export default function ProductAdd() {
 
   const fetchCategories = async () => {
     try {
-      const res = await axios.get("/categories/");
+      const token = localStorage.getItem("access_token");
+      const res = await axios.get("/categories/", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       setCategories(res.data);
     } catch (err) {
       console.error("Failed to load categories", err);
@@ -33,7 +40,10 @@ export default function ProductAdd() {
 
   const fetchBrands = async () => {
     try {
-      const res = await axios.get("/brands/");
+      const token = localStorage.getItem("access_token");
+      const res = await axios.get("/brands/", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       setBrands(res.data);
     } catch (err) {
       console.error("Failed to load brands", err);
@@ -41,8 +51,11 @@ export default function ProductAdd() {
   };
 
   const handleChange = (e) => {
-    const { name, value, files } = e.target;
-    if (files) {
+    const { name, value, files, type, checked } = e.target;
+
+    if (type === "checkbox") {
+      setFormData((prev) => ({ ...prev, [name]: checked }));
+    } else if (files && files.length > 0) {
       setFormData((prev) => ({ ...prev, [name]: files[0] }));
       setPreviewImage(URL.createObjectURL(files[0]));
     } else {
@@ -52,18 +65,39 @@ export default function ProductAdd() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    const data = new FormData();
-    Object.entries(formData).forEach(([key, value]) => {
-      if (value) data.append(key, value);
-    });
+    setLoading(true);
 
     try {
+      const token = localStorage.getItem("access_token");
+      const data = new FormData();
+
+      data.append("name", formData.name.trim());
+      data.append("description", formData.description.trim());
+      data.append("price", formData.price);
+      data.append("stock_quantity", formData.stock_quantity);
+
+      if (formData.discount !== "") {
+        data.append("discount", formData.discount);
+      }
+
+      // backend expects category_id and brand_id keys
+      data.append("category_id", formData.category);
+      data.append("brand_id", formData.brand);
+
+      if (formData.image) {
+        data.append("image", formData.image);
+      }
+
+      // featured expects boolean as string
+      data.append("featured", formData.featured ? "true" : "false");
+
       await axios.post("/products/", data, {
         headers: {
           "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${token}`,
         },
       });
+
       alert("✅ Product added successfully!");
       setFormData({
         name: "",
@@ -74,11 +108,19 @@ export default function ProductAdd() {
         category: "",
         brand: "",
         image: null,
+        featured: false,
       });
       setPreviewImage(null);
     } catch (err) {
-      console.error("Failed to add product", err);
-      alert("❌ Failed to add product.");
+      if (err.response) {
+        console.error("Failed to add product response data:", err.response.data);
+        alert("❌ Failed to add product: " + JSON.stringify(err.response.data));
+      } else {
+        console.error("Failed to add product", err);
+        alert("❌ Failed to add product.");
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -223,12 +265,32 @@ export default function ProductAdd() {
             )}
           </div>
 
+          {/* Featured Checkbox */}
+          <div className="flex items-center space-x-3 mt-4">
+            <input
+              type="checkbox"
+              id="featured"
+              name="featured"
+              checked={formData.featured}
+              onChange={handleChange}
+              className="w-5 h-5 text-purple-600 bg-gray-800 border-gray-700 rounded focus:ring-purple-500"
+            />
+            <label htmlFor="featured" className="text-gray-300">
+              📌 Mark as Featured Product
+            </label>
+          </div>
+
           {/* Submit Button */}
           <button
             type="submit"
-            className="w-full py-3 mt-4 bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-600 hover:to-purple-700 text-white font-semibold rounded-lg shadow-md transition duration-300"
+            disabled={loading}
+            className={`w-full py-3 mt-6 ${
+              loading
+                ? "bg-gray-600 cursor-not-allowed"
+                : "bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-600 hover:to-purple-700"
+            } text-white font-semibold rounded-lg shadow-md transition duration-300`}
           >
-            🚀 Add Product
+            {loading ? "Saving..." : "🚀 Add Product"}
           </button>
         </form>
       </div>

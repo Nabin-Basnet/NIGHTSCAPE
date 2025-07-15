@@ -41,7 +41,6 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         }
         return data
 
-
 # User serializer
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -58,7 +57,6 @@ class UserSerializer(serializers.ModelSerializer):
             validated_data.pop('is_staff', None)
             validated_data.pop('is_superuser', None)
         return super().update(instance, validated_data)
-
 
 # User registration serializer
 class UserRegistrationSerializer(serializers.ModelSerializer):
@@ -79,7 +77,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         validated_data['password'] = make_password(validated_data['password'])
         return User.objects.create(**validated_data)
 
-
+# Category serializer with subcategories
 class CategorySerializer(serializers.ModelSerializer):
     subcategories = serializers.SerializerMethodField()
 
@@ -90,20 +88,19 @@ class CategorySerializer(serializers.ModelSerializer):
     def get_subcategories(self, obj):
         return CategorySerializer(obj.subcategories.all(), many=True).data
 
-
+# Brand serializer
 class BrandSerializer(serializers.ModelSerializer):
     class Meta:
         model = Brand
         fields = '__all__'
 
-
+# Product Image serializer
 class ProductImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductImage
         fields = ['id', 'image', 'alt_text']
 
-
-# ✅ UPDATED ProductSerializer with featured-product sync
+# Product serializer
 class ProductSerializer(serializers.ModelSerializer):
     category = CategorySerializer(read_only=True)
     brand = BrandSerializer(read_only=True)
@@ -116,7 +113,6 @@ class ProductSerializer(serializers.ModelSerializer):
         queryset=Brand.objects.all(), write_only=True, source='brand'
     )
 
-    # Optional featured-related fields
     highlight_type = serializers.CharField(write_only=True, required=False)
     start_date = serializers.DateTimeField(write_only=True, required=False)
     end_date = serializers.DateTimeField(write_only=True, required=False)
@@ -165,45 +161,74 @@ class ProductSerializer(serializers.ModelSerializer):
 
         return instance
 
-
+# Address serializer
 class AddressSerializer(serializers.ModelSerializer):
-    user = UserSerializer(read_only=True)
-
     class Meta:
         model = Address
         fields = '__all__'
+        read_only_fields = ['user']
 
-
+# Order Item serializer
 class OrderItemSerializer(serializers.ModelSerializer):
-    product = ProductSerializer(read_only=True)
-
     class Meta:
         model = OrderItem
-        fields = ['id', 'product', 'quantity', 'price']
+        fields = ['product', 'quantity']
 
-
+# Order serializer
 class OrderSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
     address = AddressSerializer(read_only=True)
-    items = OrderItemSerializer(many=True, read_only=True)
+    address_id = serializers.PrimaryKeyRelatedField(
+        queryset=Address.objects.all(),
+        write_only=True,
+        source='address'
+    )
+    items = OrderItemSerializer(many=True, write_only=True)
 
     class Meta:
         model = Order
-        fields = '__all__'
+        fields = [
+            'id', 'user', 'address', 'address_id', 'status', 'total_amount',
+            'order_date', 'delivery_date', 'notes', 'items'
+        ]
 
+    def create(self, validated_data):
+        items_data = validated_data.pop('items')
+        user = self.context['request'].user
 
+        # Remove any user and total_amount keys to prevent conflicts
+        validated_data.pop('user', None)
+        validated_data.pop('total_amount', None)
+
+        total = 0
+        order_items = []
+        for item in items_data:
+            product = item['product']
+            quantity = item['quantity']
+            price = product.price
+            total += price * quantity
+            order_items.append((product, quantity, price))
+
+        order = Order.objects.create(user=user, total_amount=total, **validated_data)
+
+        for product, quantity, price in order_items:
+            OrderItem.objects.create(order=order, product=product, quantity=quantity, price=price)
+
+        return order
+
+# Cart serializer
 class CartSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
     product = ProductSerializer(read_only=True)
     product_id = serializers.IntegerField(write_only=True)
-    user_field = serializers.HiddenField(default=serializers.CurrentUserDefault())
 
     class Meta:
         model = Cart
         fields = ['id', 'user', 'product', 'product_id', 'quantity', 'created_at']
 
     def create(self, validated_data):
-        user = validated_data.pop('user_field')
+        user = self.context['request'].user
+
         product_id = validated_data.pop('product_id')
         quantity = validated_data.get('quantity', 1)
 
@@ -223,7 +248,7 @@ class CartSerializer(serializers.ModelSerializer):
 
         return cart_item
 
-
+# Wishlist serializer
 class WishlistSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
     product = ProductSerializer(read_only=True)
@@ -246,7 +271,7 @@ class WishlistSerializer(serializers.ModelSerializer):
 
         return wishlist_item
 
-
+# Payment serializer
 class PaymentSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
     order = OrderSerializer(read_only=True)
@@ -255,7 +280,7 @@ class PaymentSerializer(serializers.ModelSerializer):
         model = Payment
         fields = '__all__'
 
-
+# Review serializer
 class ReviewSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
     product = ProductSerializer(read_only=True)
@@ -264,7 +289,7 @@ class ReviewSerializer(serializers.ModelSerializer):
         model = Review
         fields = '__all__'
 
-
+# Return serializer
 class ReturnSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
     order = OrderSerializer(read_only=True)
@@ -274,7 +299,7 @@ class ReturnSerializer(serializers.ModelSerializer):
         model = Return
         fields = '__all__'
 
-
+# Featured Product serializer
 class FeaturedProductSerializer(serializers.ModelSerializer):
     product = ProductSerializer(read_only=True)
 

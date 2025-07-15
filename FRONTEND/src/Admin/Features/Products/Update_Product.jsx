@@ -17,6 +17,7 @@ export default function UpdateProduct() {
     category: "",
     brand: "",
     image: null,
+    featured: false,
   });
   const [previewImage, setPreviewImage] = useState(null);
   const [originalImageUrl, setOriginalImageUrl] = useState(null);
@@ -50,26 +51,31 @@ export default function UpdateProduct() {
       const res = await axios.get(`/products/${id}/`);
       const data = res.data;
       setFormData({
-        name: data.name,
-        description: data.description,
-        price: data.price,
-        stock_quantity: data.stock_quantity,
-        discount: data.discount,
-        category: data.category,
-        brand: data.brand,
+        name: data.name || "",
+        description: data.description || "",
+        price: data.price?.toString() || "",
+        stock_quantity: data.stock_quantity?.toString() || "",
+        discount: data.discount?.toString() || "",
+        category: data.category?.id?.toString() || "",
+        brand: data.brand?.id?.toString() || "",
         image: null,
+        featured: data.featured || false,
       });
-      setOriginalImageUrl(data.image); // keep existing image
+      setOriginalImageUrl(data.image); // keep existing image URL
     } catch (err) {
       console.error("Failed to fetch product", err);
     }
   };
 
   const handleChange = (e) => {
-    const { name, value, files } = e.target;
-    if (files) {
-      setFormData((prev) => ({ ...prev, [name]: files[0] }));
-      setPreviewImage(URL.createObjectURL(files[0]));
+    const { name, value, files, type, checked } = e.target;
+    if (type === "file") {
+      if (files && files.length > 0) {
+        setFormData((prev) => ({ ...prev, [name]: files[0] }));
+        setPreviewImage(URL.createObjectURL(files[0]));
+      }
+    } else if (type === "checkbox") {
+      setFormData((prev) => ({ ...prev, [name]: checked }));
     } else {
       setFormData((prev) => ({ ...prev, [name]: value }));
     }
@@ -81,7 +87,16 @@ export default function UpdateProduct() {
 
     Object.entries(formData).forEach(([key, value]) => {
       if (value !== null && value !== "") {
-        data.append(key, value);
+        // For category and brand, use correct keys if needed by backend
+        if (key === "category") {
+          data.append("category_id", value);
+        } else if (key === "brand") {
+          data.append("brand_id", value);
+        } else if (key === "featured") {
+          data.append("featured", value ? "true" : "false");
+        } else {
+          data.append(key, value);
+        }
       }
     });
 
@@ -92,7 +107,7 @@ export default function UpdateProduct() {
         },
       });
       alert("✅ Product updated successfully!");
-      navigate("/admin/products"); // Redirect if needed
+      navigate("/admin/products"); // Redirect to products list
     } catch (err) {
       console.error("Failed to update product", err);
       alert("❌ Failed to update product.");
@@ -236,6 +251,21 @@ export default function UpdateProduct() {
                 className="mt-4 h-40 object-contain border border-gray-600 rounded-md"
               />
             ) : null}
+          </div>
+
+          {/* Featured Product Checkbox */}
+          <div className="flex items-center space-x-3 mt-4">
+            <input
+              type="checkbox"
+              id="featured"
+              name="featured"
+              checked={formData.featured}
+              onChange={handleChange}
+              className="w-5 h-5 text-orange-600 bg-gray-800 border-gray-700 rounded focus:ring-orange-500"
+            />
+            <label htmlFor="featured" className="text-gray-300">
+              📌 Mark as Featured Product
+            </label>
           </div>
 
           {/* Submit Button */}
