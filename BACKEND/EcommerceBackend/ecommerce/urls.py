@@ -6,7 +6,7 @@ from ecommerce.views import landing
 from .views import (
     ProductViewSet, CategoryViewSet, CartViewSet, OrderViewSet,
     OrderItemViewSet, BrandViewSet, WishlistViewSet, UserViewSet,
-    UserRegistrationView, MyTokenObtainPairView,
+    UserRegistrationView, MyTokenObtainPairView,FeaturedProductViewSet,
 
     # ✅ ADD THESE TWO LINES
     admin_all_user_carts, admin_user_cart_detail,admin_all_wishlist_items,admin_user_wishlist_detail
@@ -24,6 +24,7 @@ router.register(r'carts', CartViewSet, basename='cart')  # Custom get_queryset
 router.register(r'orders', OrderViewSet, basename='order')  # Custom get_queryset
 router.register(r'wishlist', WishlistViewSet, basename='wishlist')  # Custom get_queryset
 router.register(r'users', UserViewSet, basename='user')
+router.register(r'featured', FeaturedProductViewSet, basename='featured-product')
 
 # URL Patterns
 urlpatterns = [

@@ -4,6 +4,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
+from rest_framework.permissions import AllowAny
 
 from .serializers import MyTokenObtainPairSerializer
 from .models import (
@@ -38,9 +39,15 @@ class UserViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
 
+# ✅ Updated to allow only admins to create/update/delete products
 class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all().order_by('id')
     serializer_class = ProductSerializer
+
+    def get_permissions(self):
+        if self.request.method in ['POST', 'PUT', 'PATCH', 'DELETE']:
+            return [IsAdminUser()]
+        return [AllowAny()]
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
@@ -71,9 +78,6 @@ class CartViewSet(viewsets.ModelViewSet):
 @api_view(['GET'])
 @permission_classes([IsAdminUser])
 def admin_all_user_carts(request):
-    print("User:", request.user)
-    print("Is Authenticated:", request.user.is_authenticated)
-    print("Is Staff:", request.user.is_staff)
     users = User.objects.filter(cart__isnull=False).distinct()
     data = [
         {
@@ -178,4 +182,13 @@ class ReturnViewSet(viewsets.ModelViewSet):
 class FeaturedProductViewSet(viewsets.ModelViewSet):
     queryset = FeaturedProduct.objects.all()
     serializer_class = FeaturedProductSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
+
+
+# ✅ Public API: List of all featured products with product info
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def featured_products_list(request):
+    featured_products = FeaturedProduct.objects.select_related('product').all()
+    serializer = FeaturedProductSerializer(featured_products, many=True)
+    return Response(serializer.data)

@@ -34,8 +34,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     phone = models.CharField(max_length=20, blank=True, null=True)
     role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='customer')
     is_active = models.BooleanField(default=True)
-    is_staff = models.BooleanField(default=False)      # Added for admin/staff flag
-    is_superuser = models.BooleanField(default=False)  # Added for superuser flag
+    is_staff = models.BooleanField(default=False)
+    is_superuser = models.BooleanField(default=False)
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -47,8 +47,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return self.email
 
-
-# Your other models...
 
 class Category(models.Model):
     name = models.CharField(max_length=255)
@@ -79,8 +77,24 @@ class Product(models.Model):
     discount = models.FloatField(blank=True, null=True)
     rating = models.FloatField(default=0.0)
     image = models.ImageField(upload_to='products/', blank=True, null=True)
+    featured = models.BooleanField(default=False)  # ✅ New field added
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+        if self.featured:
+            FeaturedProduct.objects.get_or_create(
+                product=self,
+                defaults={
+                    'highlight_type': 'default',
+                    'start_date': timezone.now(),
+                    'end_date': timezone.now() + timezone.timedelta(days=30)
+                }
+            )
+        else:
+            FeaturedProduct.objects.filter(product=self).delete()
 
     def __str__(self):
         return self.name
@@ -206,7 +220,7 @@ class Return(models.Model):
 
 
 class FeaturedProduct(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    product = models.OneToOneField(Product, on_delete=models.CASCADE)  # Ensures one-to-one relationship
     highlight_type = models.CharField(max_length=100)
     start_date = models.DateTimeField()
     end_date = models.DateTimeField()

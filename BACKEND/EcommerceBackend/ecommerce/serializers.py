@@ -2,6 +2,7 @@ from rest_framework import serializers
 from django.contrib.auth.hashers import make_password
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.contrib.auth import authenticate
+from django.utils import timezone
 from .models import (
     User, Category, Brand, Product, ProductImage, Address, Order, OrderItem,
     Cart, Wishlist, Payment, Review, Return, FeaturedProduct
@@ -40,7 +41,8 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         }
         return data
 
-# User serializer (with is_staff and is_superuser)
+
+# User serializer
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -53,10 +55,10 @@ class UserSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         request = self.context.get('request')
         if request and not request.user.is_superuser:
-            # Prevent non-superusers from changing is_staff and is_superuser
             validated_data.pop('is_staff', None)
             validated_data.pop('is_superuser', None)
         return super().update(instance, validated_data)
+
 
 # User registration serializer
 class UserRegistrationSerializer(serializers.ModelSerializer):
@@ -101,14 +103,67 @@ class ProductImageSerializer(serializers.ModelSerializer):
         fields = ['id', 'image', 'alt_text']
 
 
+# ✅ UPDATED ProductSerializer with featured-product sync
 class ProductSerializer(serializers.ModelSerializer):
     category = CategorySerializer(read_only=True)
     brand = BrandSerializer(read_only=True)
     images = ProductImageSerializer(many=True, read_only=True)
 
+    category_id = serializers.PrimaryKeyRelatedField(
+        queryset=Category.objects.all(), write_only=True, source='category'
+    )
+    brand_id = serializers.PrimaryKeyRelatedField(
+        queryset=Brand.objects.all(), write_only=True, source='brand'
+    )
+
+    # Optional featured-related fields
+    highlight_type = serializers.CharField(write_only=True, required=False)
+    start_date = serializers.DateTimeField(write_only=True, required=False)
+    end_date = serializers.DateTimeField(write_only=True, required=False)
+
     class Meta:
         model = Product
         fields = '__all__'
+
+    def create(self, validated_data):
+        highlight_type = validated_data.pop('highlight_type', None)
+        start_date = validated_data.pop('start_date', None)
+        end_date = validated_data.pop('end_date', None)
+
+        product = Product.objects.create(**validated_data)
+
+        if product.featured:
+            FeaturedProduct.objects.update_or_create(
+                product=product,
+                defaults={
+                    'highlight_type': highlight_type or 'default',
+                    'start_date': start_date or timezone.now(),
+                    'end_date': end_date or (timezone.now() + timezone.timedelta(days=30))
+                }
+            )
+
+        return product
+
+    def update(self, instance, validated_data):
+        highlight_type = validated_data.pop('highlight_type', None)
+        start_date = validated_data.pop('start_date', None)
+        end_date = validated_data.pop('end_date', None)
+
+        instance = super().update(instance, validated_data)
+
+        if instance.featured:
+            FeaturedProduct.objects.update_or_create(
+                product=instance,
+                defaults={
+                    'highlight_type': highlight_type or 'default',
+                    'start_date': start_date or timezone.now(),
+                    'end_date': end_date or (timezone.now() + timezone.timedelta(days=30))
+                }
+            )
+        else:
+            FeaturedProduct.objects.filter(product=instance).delete()
+
+        return instance
 
 
 class AddressSerializer(serializers.ModelSerializer):
