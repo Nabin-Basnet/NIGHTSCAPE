@@ -183,7 +183,7 @@ class OrderSerializer(serializers.ModelSerializer):
         write_only=True,
         source='address'
     )
-    items = OrderItemSerializer(many=True, write_only=True)
+    items = OrderItemSerializer(many=True)  # ✅ Removed write_only=True
 
     class Meta:
         model = Order
@@ -196,7 +196,6 @@ class OrderSerializer(serializers.ModelSerializer):
         items_data = validated_data.pop('items')
         user = self.context['request'].user
 
-        # Remove any user and total_amount keys to prevent conflicts
         validated_data.pop('user', None)
         validated_data.pop('total_amount', None)
 

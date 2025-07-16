@@ -4,6 +4,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
+from rest_framework.exceptions import ValidationError
 
 from .serializers import (
     MyTokenObtainPairSerializer,
@@ -175,18 +176,29 @@ class OrderViewSet(viewsets.ModelViewSet):
         user = self.request.user
         items_data = self.request.data.get('items', [])
 
-        # Save order without items first
-        order = serializer.save(user=user)
-
-        # Create OrderItems related to the order
+        # Validate stock using correct field name
         for item in items_data:
             product_id = item.get('product')
             quantity = item.get('quantity', 1)
-
             try:
                 product = Product.objects.get(id=product_id)
+                if product.stock_quantity < quantity:
+                    raise ValidationError(f"Not enough stock for {product.name}. Available: {product.stock_quantity}")
             except Product.DoesNotExist:
-                continue
+                raise ValidationError("Product does not exist.")
+
+        # Save order
+        order = serializer.save(user=user)
+        total = 0
+
+        for item in items_data:
+            product_id = item.get('product')
+            quantity = item.get('quantity', 1)
+            product = Product.objects.get(id=product_id)
+
+            # Deduct stock
+            product.stock_quantity -= quantity
+            product.save()
 
             OrderItem.objects.create(
                 order=order,
@@ -194,9 +206,8 @@ class OrderViewSet(viewsets.ModelViewSet):
                 quantity=quantity,
                 price=product.price
             )
+            total += product.price * quantity
 
-        # Update total amount based on created order items
-        total = sum(oi.price * oi.quantity for oi in order.items.all())
         order.total_amount = total
         order.save()
 

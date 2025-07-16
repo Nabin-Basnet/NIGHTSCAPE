@@ -40,6 +40,7 @@ import UpdateCategory from './Features/Category/Update_Category';
 import AddBrand from './Features/Brands/Add_Brands';
 import UpdateBrand from './Features/Brands/Update_Brands';
 import UserWishlistDetails from './Pages/UserWishlistDetail';
+import OrderDetail from './Pages/OrderDetail';
 
 export const AdminRoutes = () => <Outlet />;
 
@@ -111,6 +112,10 @@ export const adminRoutesConfig = [
   {
     path: ADMIN_USERS,
     element: <Users />,
+  },
+  {
+    path:"/admin/orders/:id",
+     element:<OrderDetail />
   },
   {
     path: ADMIN_REVIEW,
