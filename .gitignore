@@ -5,9 +5,14 @@ backend/myvenv/
 *.sqlite3
 *.log
 
+# Ignore .env files for backend
+backend/EcommerceBackend/.env
+
 # === Node / React ===
 frontend/node_modules/
 frontend/build/
+
+# Ignore frontend env files
 frontend/.env
 
 # === System / Editor Files ===
@@ -16,4 +21,6 @@ frontend/.env
 .vscode/
 .idea/
 
-.gitignore
+# Allow tracking of example env files (optional, but recommended)
+!.env.example
+backend/EcommerceBackend/.env
