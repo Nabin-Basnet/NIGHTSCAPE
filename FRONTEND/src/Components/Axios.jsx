@@ -2,7 +2,7 @@
 import axios from 'axios';
 
 const AxiosInstance = axios.create({
-  baseURL: "https://your-backend.onrender.com/api/",
+  baseURL: "https://nightscape.onrender.com//api/",
 });
 
 // ✅ Attach access token on every request
