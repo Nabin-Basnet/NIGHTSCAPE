@@ -3,16 +3,13 @@ import React, { useEffect, useState } from "react";
 import { FaPhone, FaLock, FaUser, FaSearch } from "react-icons/fa";
 import { BsCart4 } from "react-icons/bs";
 import { Link, useNavigate } from "react-router-dom";
-import { jwtDecode } from "jwt-decode"; // ✅ correct import
+import { jwtDecode } from "jwt-decode";
 
 import {
   HOME_ROUTE,
   ABOUT_ROUTE,
   PRODUCTS_ROUTE,
-  OFFER_ROUTE,
   CONTACT_ROUTE,
-  CUSTOM_DESIGN_ROUTE,
-  BEST_SELLER,
   SIGNUP_ROUTE,
   LOGIN_ROUTE,
   ACCOUNT_ROUTE,
@@ -29,12 +26,10 @@ export default function Navbar() {
     const token = localStorage.getItem("access_token");
     if (token) {
       try {
-        const decoded = jwtDecode(token); // ✅ correct usage
-        console.log("Decoded JWT:", decoded);
+        const decoded = jwtDecode(token);
         setIsAuthenticated(true);
-        setRole(decoded.role); // expected: 'admin' or 'customer'
-      } catch (error) {
-        console.error("Token decoding failed:", error);
+        setRole(decoded.role);
+      } catch {
         setIsAuthenticated(false);
         setRole(null);
       }
@@ -50,57 +45,62 @@ export default function Navbar() {
   };
 
   return (
-    <div className="bg-[#121212] text-white">
+    <div className="bg-[#2c2c2c] text-[#FFF8E1]">
       {/* Header Top */}
-      <div className="flex justify-end items-center h-[50px] bg-[#1e1e1e] text-sm font-medium font-sans border-b border-gray-700">
-        <div className="ml-[700px] text-gray-300 hover:text-[#ff5c00]">
-          <a href="#"><FaPhone className="inline" /> 9708845245</a>
+      <div className="flex justify-end items-center h-12 bg-[#333333] text-sm font-medium border-b border-[#555555] px-4">
+        <div className="ml-auto text-[#FFD54F] hover:text-[#FFCA28]">
+          <a href="tel:9708845245" className="flex items-center gap-1">
+            <FaPhone /> 9708845245
+          </a>
         </div>
 
-        <div className="h-[25px] border-r-2 border-gray-600 mx-2"></div>
+        <div className="h-6 border-r-2 border-[#555555] mx-3"></div>
 
         {!isAuthenticated ? (
           <>
-            <div className="text-gray-300 hover:text-[#ff5c00]">
-              <Link to={SIGNUP_ROUTE}><FaLock className="inline" /> Sign In</Link>
+            <div className="text-[#FFD54F] hover:text-[#FFCA28]">
+              <Link to={SIGNUP_ROUTE} className="flex items-center gap-1">
+                <FaLock /> Sign Up
+              </Link>
             </div>
 
-            <div className="h-[25px] border-r-2 border-gray-600 mx-2"></div>
+            <div className="h-6 border-r-2 border-[#555555] mx-3"></div>
 
-            <div className="text-gray-300 hover:text-[#ff5c00]">
-              <Link to={LOGIN_ROUTE}><FaLock className="inline" /> Log in</Link>
+            <div className="text-[#FFD54F] hover:text-[#FFCA28]">
+              <Link to={LOGIN_ROUTE} className="flex items-center gap-1">
+                <FaLock /> Log In
+              </Link>
             </div>
           </>
         ) : (
           <>
-            <div className="text-gray-300 hover:text-[#ff5c00]">
+            <div className="text-[#FFD54F] hover:text-[#FFCA28]">
               <button onClick={handleLogout} className="flex items-center gap-1">
-                <FaLock className="inline" /> Log out
+                <FaLock /> Log Out
               </button>
             </div>
 
-            <div className="h-[25px] border-r-2 border-gray-600 mx-2"></div>
+            <div className="h-6 border-r-2 border-[#555555] mx-3"></div>
 
-            {/* ✅ Correct role-based account link */}
-            <div className="text-gray-300 hover:text-[#ff5c00]">
-              <Link to={role === "admin" ? ADMIN_ROUTE : ACCOUNT_ROUTE}>
-                <FaUser className="inline" /> My Account
+            <div className="text-[#FFD54F] hover:text-[#FFCA28]">
+              <Link to={role === "admin" ? ADMIN_ROUTE : ACCOUNT_ROUTE} className="flex items-center gap-1">
+                <FaUser /> My Account
               </Link>
             </div>
           </>
         )}
 
-        <div className="w-[70px] h-[50px] bg-gray-700 ml-8 text-white flex items-center justify-center">
+        <div className="w-20 h-12 bg-[#444444] ml-8 text-[#FFF8E1] flex items-center justify-center rounded-md font-semibold">
           NEP
         </div>
       </div>
 
       {/* Header Middle */}
-      <div className="flex items-center h-[100px] bg-[#181818] border-b border-gray-700">
-        <div className="ml-[150px] mt-2">
+      <div className="flex items-center h-24 bg-[#383838] border-b border-[#555555] px-10">
+        <div>
           <Link to={HOME_ROUTE}>
             <img
-              className="h-30 w-auto object-contain"
+              className="h-20 w-auto object-contain"
               src="/images/logo.png"
               alt="logo"
             />
@@ -110,51 +110,59 @@ export default function Navbar() {
         <input
           type="text"
           placeholder="Search the store"
-          className="h-[35px] w-[380px] ml-[170px] mt-7 rounded-l-md px-2 bg-gray-900 text-white border border-gray-600 placeholder-gray-400"
+          className="h-10 w-96 ml-12 rounded-l-md px-4 bg-[#444444] text-[#FFF8E1] border border-[#666666] placeholder-[#FFD54F] focus:outline-none focus:ring-2 focus:ring-[#FFD54F]"
         />
 
-        <button className="h-[41px] w-[60px] mt-7 bg-[#ff5c00] text-white rounded-r-md hover:bg-[#ff784e] flex items-center justify-center">
+        <button className="h-10 w-16 ml-0 bg-[#FFD54F] text-[#2c2c2c] rounded-r-md hover:bg-[#FFCA28] flex items-center justify-center transition duration-200">
           <FaSearch />
         </button>
 
-        <div className="mt-[35px] ml-[80px]">
-          <Link to={CART_ROUTE}><BsCart4 size={35} /></Link>
+        <div className="ml-8">
+          <Link to={CART_ROUTE}>
+            <BsCart4 size={35} className="hover:text-[#FFD54F] transition duration-200 text-[#FFF8E1]" />
+          </Link>
         </div>
       </div>
 
       {/* Main Navbar */}
-      <div className="h-[60px] w-full border-b border-gray-600">
-        <div className="flex justify-center items-center h-full space-x-4 text-white text-sm">
-          {[ 
+      <div className="h-16 w-full border-b border-[#555555] bg-[#383838]">
+        <div className="flex justify-center items-center h-full space-x-6 text-[#FFF8E1] text-sm">
+          {[  
             { text: "Home", link: HOME_ROUTE },
             { text: "Products", link: PRODUCTS_ROUTE },
-            { text: "Custom Design", link: CUSTOM_DESIGN_ROUTE },
-            { text: "Best Sellers", link: BEST_SELLER },
-            { text: "Offers / Sale", link: OFFER_ROUTE },
             { text: "About Us", link: ABOUT_ROUTE },
             { text: "Contact", link: CONTACT_ROUTE },
           ].map(({ text, link }, index) => (
             <Link
               to={link}
               key={index}
-              className="px-4 py-2 hover:bg-[#ed1c24] rounded-sm"
+              className="px-4 py-2 hover:bg-[#FFD54F] hover:text-[#2c2c2c] rounded-md transition duration-200"
             >
               {text}
             </Link>
           ))}
 
           {isAuthenticated && role === "admin" && (
-            <Link to={ADMIN_ROUTE} className="px-4 py-2 hover:bg-[#ed1c24] rounded-sm">
+            <Link
+              to={ADMIN_ROUTE}
+              className="px-4 py-2 hover:bg-[#FFD54F] hover:text-[#2c2c2c] rounded-md transition duration-200"
+            >
               Admin Panel
             </Link>
           )}
 
           {isAuthenticated && role === "customer" && (
             <>
-              <Link to={CART_ROUTE} className="px-4 py-2 hover:bg-[#ed1c24] rounded-sm">
+              <Link
+                to={CART_ROUTE}
+                className="px-4 py-2 hover:bg-[#FFD54F] hover:text-[#2c2c2c] rounded-md transition duration-200"
+              >
                 My Cart
               </Link>
-              <Link to="/wishlist" className="px-4 py-2 hover:bg-[#ed1c24] rounded-sm">
+              <Link
+                to="/wishlist"
+                className="px-4 py-2 hover:bg-[#FFD54F] hover:text-[#2c2c2c] rounded-md transition duration-200"
+              >
                 Wishlist
               </Link>
             </>

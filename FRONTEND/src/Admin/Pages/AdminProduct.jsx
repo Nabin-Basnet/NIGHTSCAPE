@@ -1,7 +1,17 @@
-import React, { useEffect, useState } from "react";
+"use client";
+
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AxiosInstance from "../../Components/Axios";
-import { ADMIN_PRODUCT, ADD_PRODUCT } from "../Constants/AdminMenu";
+import { ADD_PRODUCT } from "../Constants/AdminMenu";
+import {
+  FaPlus,
+  FaSearch,
+  FaEdit,
+  FaTrashAlt,
+  FaSpinner,
+  FaBoxOpen,
+} from "react-icons/fa";
 
 export default function AdminProductList() {
   const [products, setProducts] = useState([]);
@@ -43,104 +53,127 @@ export default function AdminProductList() {
   };
 
   return (
-    <div className="p-6">
+    <div className="p-6 bg-white text-gray-800 min-h-screen rounded-lg shadow-lg border border-gray-200">
       {/* Header and Add Button */}
-      <div className="flex items-center justify-between mb-4">
-        <h1 className="text-3xl font-bold">Admin Products</h1>
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-3xl font-bold">Product Management</h1>
         <button
           onClick={() => navigate(`/admin/${ADD_PRODUCT}`)}
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          className="inline-flex items-center px-5 py-2.5 bg-gradient-to-r from-orange-500 to-red-500 text-white font-semibold rounded-full hover:from-orange-600 hover:to-red-600 transition-transform duration-300 hover:scale-105"
         >
-          + Add Product
+          <FaPlus className="mr-2" /> Add Product
         </button>
       </div>
 
       {/* Search Box */}
-      <input
-        type="text"
-        placeholder="Search products..."
-        className="border rounded px-4 py-2 mb-4 max-w-md w-full"
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-      />
+      <div className="relative mb-6 max-w-md">
+        <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
+        <input
+          type="text"
+          placeholder="Search products by name..."
+          className="w-full pl-10 pr-4 py-2.5 rounded-md bg-white border border-gray-300 text-gray-800 placeholder-gray-500 focus:ring-2 focus:ring-orange-500 outline-none"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+      </div>
 
       {/* Product Table */}
       {loading ? (
-        <p>Loading...</p>
+        <div className="flex items-center justify-center py-10">
+          <FaSpinner className="animate-spin text-orange-500 w-8 h-8 mr-2" />
+          <span className="text-gray-600 text-lg">Loading products...</span>
+        </div>
       ) : products.length > 0 ? (
-        <table className="w-full border-collapse border border-gray-300">
-          <thead>
-            <tr>
-              <th className="border border-gray-300 p-2">ID</th>
-              <th className="border border-gray-300 p-2">Image</th>
-              <th className="border border-gray-300 p-2">Name</th>
-              <th className="border border-gray-300 p-2">Category</th>
-              <th className="border border-gray-300 p-2">Brand</th>
-              <th className="border border-gray-300 p-2">Price</th>
-              <th className="border border-gray-300 p-2">Stock Qty</th>
-              <th className="border border-gray-300 p-2">Discount</th>
-              <th className="border border-gray-300 p-2">Description</th>
-              <th className="border border-gray-300 p-2">Featured</th>
-              <th className="border border-gray-300 p-2">Created At</th>
-              <th className="border border-gray-300 p-2">Updated At</th>
-              <th className="border border-gray-300 p-2">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {products.map((p) => (
-              <tr key={p.id}>
-                <td className="border border-gray-300 p-2">{p.id}</td>
-                <td className="border border-gray-300 p-2">
-                  {p.image ? (
+        <div className="overflow-x-auto border border-gray-200 rounded-md">
+          <table className="w-full text-sm text-left text-gray-700">
+            <thead className="bg-gray-100 text-xs text-gray-600 uppercase">
+              <tr>
+                <th className="px-4 py-3">ID</th>
+                <th className="px-4 py-3">Image</th>
+                <th className="px-4 py-3">Name</th>
+                <th className="px-4 py-3">Category</th>
+                <th className="px-4 py-3">Brand</th>
+                <th className="px-4 py-3">Price</th>
+                <th className="px-4 py-3">Stock</th>
+                <th className="px-4 py-3">Discount</th>
+                <th className="px-4 py-3">Description</th>
+                <th className="px-4 py-3 text-center">Featured</th>
+                <th className="px-4 py-3">Created</th>
+                <th className="px-4 py-3">Updated</th>
+                <th className="px-4 py-3 text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {products.map((p) => (
+                <tr
+                  key={p.id}
+                  className="bg-white border-b border-gray-200 hover:bg-gray-100 transition"
+                >
+                  <td className="px-4 py-3 font-medium">{p.id}</td>
+                  <td className="px-4 py-3">
                     <img
-                      src={p.image}
+                      src={p.image || "/placeholder.svg"}
                       alt={p.name}
-                      className="h-16 w-16 object-cover rounded"
                       onError={(e) => {
                         e.target.onerror = null;
-                        e.target.src = "https://placehold.co/64x64?text=No+Image";
+                        e.target.src = "/placeholder.svg";
                       }}
+                      className="w-14 h-14 object-cover rounded-md border border-gray-300"
                     />
-                  ) : (
-                    <span>No Image</span>
-                  )}
-                </td>
-                <td className="border border-gray-300 p-2">{p.name}</td>
-                <td className="border border-gray-300 p-2">{p.category?.name || "N/A"}</td>
-                <td className="border border-gray-300 p-2">{p.brand?.name || "N/A"}</td>
-                <td className="border border-gray-300 p-2">${p.price.toFixed(2)}</td>
-                <td className="border border-gray-300 p-2">{p.stock_quantity}</td>
-                <td className="border border-gray-300 p-2">{p.discount ? `${p.discount}%` : "0%"}</td>
-                <td className="border border-gray-300 p-2">{p.description}</td>
-                <td className="border border-gray-300 p-2 text-center text-lg">
-                  {p.featured ? "✅" : "❌"}
-                </td>
-                <td className="border border-gray-300 p-2">
-                  {new Date(p.created_at).toLocaleString()}
-                </td>
-                <td className="border border-gray-300 p-2">
-                  {new Date(p.updated_at).toLocaleString()}
-                </td>
-                <td className="border border-gray-300 p-2 space-x-2">
-                  <button
-                    onClick={() => handleEdit(p)}
-                    className="text-blue-600 hover:underline"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => handleDelete(p.id)}
-                    className="text-red-600 hover:underline"
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                  </td>
+                  <td className="px-4 py-3">{p.name}</td>
+                  <td className="px-4 py-3">{p.category?.name || "N/A"}</td>
+                  <td className="px-4 py-3">{p.brand?.name || "N/A"}</td>
+                  <td className="px-4 py-3 text-green-600">
+                    ${p.price.toFixed(2)}
+                  </td>
+                  <td className="px-4 py-3">{p.stock_quantity}</td>
+                  <td className="px-4 py-3">{p.discount || 0}%</td>
+                  <td className="px-4 py-3 max-w-[200px] truncate">
+                    {p.description || "No description"}
+                  </td>
+                  <td className="px-4 py-3 text-center">
+                    {p.featured ? (
+                      <span className="text-green-600">✅</span>
+                    ) : (
+                      <span className="text-red-500">❌</span>
+                    )}
+                  </td>
+                  <td className="px-4 py-3 text-xs">
+                    {new Date(p.created_at).toLocaleString()}
+                  </td>
+                  <td className="px-4 py-3 text-xs">
+                    {new Date(p.updated_at).toLocaleString()}
+                  </td>
+                  <td className="px-4 py-3 text-center space-x-2">
+                    <button
+                      onClick={() => handleEdit(p)}
+                      className="text-blue-600 hover:text-blue-500 transition"
+                      title="Edit"
+                    >
+                      <FaEdit className="w-5 h-5" />
+                    </button>
+                    <button
+                      onClick={() => handleDelete(p.id)}
+                      className="text-red-600 hover:text-red-500 transition"
+                      title="Delete"
+                    >
+                      <FaTrashAlt className="w-5 h-5" />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       ) : (
-        <p>No products found.</p>
+        <div className="text-center py-10 bg-gray-100 rounded-lg border border-gray-200">
+          <FaBoxOpen className="w-14 h-14 text-gray-400 mx-auto mb-3" />
+          <p className="text-xl text-gray-700 font-semibold">No products found</p>
+          <p className="text-gray-500 text-sm mt-1">
+            Try adjusting your search or add a new product.
+          </p>
+        </div>
       )}
     </div>
   );
