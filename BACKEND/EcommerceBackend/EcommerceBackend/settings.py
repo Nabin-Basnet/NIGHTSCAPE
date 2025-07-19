@@ -25,7 +25,12 @@ SECRET_KEY = 'django-insecure-*89op43egqcfez4ee97g01jv#ao85nw#6(#&@4*uh+y%$%1b8#
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    "nightscape-backend.onrender.com",
+    "nightscape.onrender.com",
+    "localhost",
+    "127.0.0.1",
+]
 
 
 AUTH_USER_MODEL = 'ecommerce.User'
